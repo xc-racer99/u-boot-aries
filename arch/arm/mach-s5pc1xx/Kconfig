@@ -4,6 +4,10 @@ choice
 	prompt "S5PC1XX board select"
 	optional
 
+config TARGET_S5P_GALAXYS4G
+	bool "S5P Galaxy S 4G board"
+	select OF_CONTROL
+
 config TARGET_S5P_GONI
 	bool "S5P Goni board"
 	select OF_CONTROL
@@ -17,6 +21,7 @@ endchoice
 config SYS_SOC
 	default "s5pc1xx"
 
+source "board/samsung/galaxys4g/Kconfig"
 source "board/samsung/goni/Kconfig"
 source "board/samsung/smdkc100/Kconfig"
 
