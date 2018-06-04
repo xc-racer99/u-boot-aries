@@ -535,6 +535,18 @@ config SPL_ONENAND_SUPPORT
 	  load U-Boot from supported devices. This enables the drivers in
 	  drivers/mtd/onenand as part of an SPL build.
 
+config SYS_ONENAND_U_BOOT_OFFS
+	hex "Offset on OneNAND of U-Boot image"
+	depends on SPL_ONENAND_SUPPORT
+	help
+	  Define the offset of the U-Boot image on the OneNAND flash
+
+config SYS_ONENAND_PAGE_SIZE
+	hex "Size of OneNAND page"
+	depends on SPL_ONENAND_SUPPORT
+	help
+	  Defines the page size of the OneNAND flash for reading the U-Boot header
+
 config SPL_OS_BOOT
 	bool "Activate Falcon Mode"
 	depends on !TI_SECURE_DEVICE
