@@ -24,7 +24,25 @@ DECLARE_GLOBAL_DATA_PTR;
 
 u32 get_board_rev(void)
 {
-	return 0;
+	int i;
+	u32 hwrev = 0;
+
+	int hwrev_gpios[4] = {
+		S5PC110_GPIO_J02,
+		S5PC110_GPIO_J03,
+		S5PC110_GPIO_J04,
+		S5PC110_GPIO_J07,
+	};
+
+	for (i = 0; i < 4; i++) {
+		gpio_request(hwrev_gpios[i], "hw_rev");
+		gpio_cfg_pin(hwrev_gpios[i], S5P_GPIO_INPUT);
+		gpio_set_pull(hwrev_gpios[i], S5P_GPIO_PULL_NONE);
+		hwrev |= gpio_get_value(hwrev_gpios[i]) << i;
+		gpio_free(hwrev_gpios[i]);
+	}
+
+	return hwrev;
 }
 
 int mach_cpu_init(void)
