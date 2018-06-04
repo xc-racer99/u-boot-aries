@@ -72,13 +72,15 @@
 	"s5pc1xx-galaxys4g.dtb ext4 0 2;" \
 	"root part 0 5\0"
 
-#define CONFIG_BOOTCOMMAND	"run galaxys4g_boot;"
+#define CONFIG_BOOTCOMMAND	"run android_3_0_boot;"
 
 #define CONFIG_DEFAULT_CONSOLE	"ttySAC2,115200n8"
 
-#define CONFIG_COMMON_BOOT	"${console} ${meminfo} ${mtdparts}"
+#define CONFIG_COMMON_BOOT	"${console} ${meminfo} ${mtdparts} androidboot.serialno=${serial#} androidboot.mode=${boot_mode}"
 
-/* TODO - Read S5P_INFORM6 and check for recovery mode */
+/* 3.0 Kernel sets serialno, mtdparts automatically/as needed */
+#define BOOTARGS_3_0		"${console} androidboot.mode=${boot_mode}"
+
 #define VOLUME_UP_KEY		"gph31"
 
 #define CONFIG_MISC_COMMON
@@ -92,7 +94,9 @@
 	"meminfo=mem=80M mem=256M@0x40000000 mem=128M@0x50000000\0" \
 	"normal_boot=onenand read 0x32000000 0x1980000 0xA00000; bootm 0x32000000\0" \
 	"recovery_boot=onenand read 0x32000000 0x2380000 0xA00000; bootm 0x32000000\0" \
-	"galaxys4g_boot=if gpio input " VOLUME_UP_KEY "; then run recovery_boot; else run normal_boot; fi\0" \
+	"android_3_0_boot=set bootargs " BOOTARGS_3_0 "; run common_boot\0" \
+	"upstream_boot=set bootargs " CONFIG_COMMON_BOOT "; run common_boot\0" \
+	"common_boot=if gpio input " VOLUME_UP_KEY " || test ${boot_mode} = recovery; then run recovery_boot; else run normal_boot; fi\0" \
 	"dfu_alt_info=" CONFIG_DFU_ALT "\0"
 
 
