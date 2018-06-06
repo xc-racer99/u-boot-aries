@@ -213,7 +213,23 @@ int checkboard(void)
 #ifdef CONFIG_MMC
 int board_mmc_init(bd_t *bis)
 {
-	int i, ret_sd = 0;
+	struct udevice *dev;
+	int i, reg, ret = 0;
+
+	/* Enable vmmc LDO */
+	ret = pmic_get("max8998-pmic", &dev);
+	if (ret) {
+		pr_err("Failed to get max8998-pmic");
+		return ret;
+	}
+
+	reg = pmic_reg_read(dev, MAX8998_REG_ONOFF1);
+	reg |= MAX8998_LDO5;
+	ret = pmic_reg_write(dev, MAX8998_REG_ONOFF1, reg);
+	if (ret) {
+		pr_err("MAX8998 LDO setting error!\n");
+		return -EINVAL;
+	}
 
 	/*
 	 * SD card (T_FLASH) detect and init
@@ -239,12 +255,12 @@ int board_mmc_init(bd_t *bis)
 			gpio_set_drv(i, S5P_GPIO_DRV_2X);
 		}
 
-		ret_sd = s5p_mmc_init(2, 4);
-		if (ret_sd)
+		ret = s5p_mmc_init(2, 4);
+		if (ret)
 			pr_err("MMC: Failed to init SD card (MMC:2).\n");
 	}
 
-	return ret_sd;
+	return ret;
 }
 #endif
 
