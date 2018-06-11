@@ -46,120 +46,18 @@ u32 get_board_rev(void)
 	return hwrev;
 }
 
-int mach_cpu_init(void)
+int board_early_init_f(void)
 {
 	int val;
-	int i;
 
-	/*
-	 * Initialize Async Register Setting for EVT1
-	 * Because we are setting EVT1 as the default value of EVT0,
-	 * setting EVT0 as well does not make things worse.
-	 * Thus, for the simplicity, we set for EVT0, too
-	 *
-	 * The "Async Registers" are:
-	 *	0xE0F0_0000
-	 *	0xE1F0_0000
-	 *	0xF180_0000
-	 *	0xF190_0000
-	 *	0xF1A0_0000
-	 *	0xF1B0_0000
-	 *	0xF1C0_0000
-	 *	0xF1D0_0000
-	 *	0xF1E0_0000
-	 *	0xF1F0_0000
-	 *	0xFAF0_0000
-	 */
+	gpio_request(S5PC110_GPIO_MP057, "uart_sel");
+	gpio_set_pull(S5PC110_GPIO_MP057, S5P_GPIO_PULL_UP);
+	gpio_direction_output(S5PC110_GPIO_MP057, 1);
 
-	int regs[11] = {
-		0xe0f00000,
-		0xe1f00000,
-		0xf1800000,
-		0xf1900000,
-		0xf1a00000,
-		0xf1b00000,
-		0xf1c00000,
-		0xf1d00000,
-		0xf1e00000,
-		0xf1f00000,
-		0xfaf00000,
-	};
-
-	for (i = 0; i < 11; i++) {
-		val = readl(regs[i]);
-		val = val & (!0x1);
-		writel(val, regs[i]);
-	}
-
-	/*
-	 * Diable ABB block to reduce sleep current at low temperature
-	 * Note that it's hidden register setup don't modify it
-	 */
-	writel(0x00800000, 0xE010C300);
-
-	/* Disable Watchdog */
-	writel(0, S5PC110_WATCHDOG_BASE);
-
-	/* setting SRAM */
-	writel(0x9, S5PC110_SROMC_BASE);
-
-	/*
-	 * S5PC110 has 3 groups of interrupt sources
-	 * Disable all interrupts (VIC0, VIC1 and VIC2)
-	 */
-	writel(0, S5PC110_VIC0_BASE + 0x14); /* INTENCLEAR */
-	writel(0, S5PC110_VIC0_BASE + 0x00100000 + 0x14); /* VIC1 + INTENCLEAR */
-	writel(0, S5PC110_VIC0_BASE + 0x00200000 + 0x14); /* VIC2 + INTENCLEAR */
-
-	/* Set all interrupts as IRQ */
-	writel(0, S5PC110_VIC0_BASE + 0xc); /* INTSELECT */
-	writel(0, S5PC110_VIC0_BASE + 0x00100000 + 0xc); /* VIC1 + INTSELECT */
-	writel(0, S5PC110_VIC0_BASE + 0x00200000 + 0xc); /* VIC2 + INTSELECT */
-
-	/* Pending Interrupt Clear */
-	writel(0, S5PC110_VIC0_BASE + 0xf00); /* INTADDRESS */
-	writel(0, S5PC110_VIC0_BASE + 0x00100000 + 0xf00); /* VIC1 + INTADDRESS */
-	writel(0, S5PC110_VIC0_BASE + 0x00200000 + 0xf00); /* VIC2 + INTADDRESS */
-
-	/*
-	 * uart_asm_init: Initialize UART's pins
-	 *
-	 * set GPIO to enable UART0-UART4
-	 */
-	writel(0x22222222, S5PC110_GPIO_BASE + 0x0); /* GPIO_A0_OFFSET */
-	writel(0x00002222, S5PC110_GPIO_BASE + 0x20); /* GPIO_A1_OFFSET */
-
-	/*
-	 * Note that the following address
-	 * 0xE020'0360 is reserved address at S5PC100
-	 */
-	/* UART_SEL MP0_5[7] at S5PC110 */
-	val = readl(S5PC110_GPIO_BASE + 0x360 + 0x0); /* S5PC110_GPIO_MP0_5_OFFSET + S5PC1XX_GPIO_CON_OFFSET*/
-	val &= (!(0xf << 28)); /* 28 = 7 * 4-bit */
-	val |= (0x1 << 28); /* Output */
-	writel(val, S5PC110_GPIO_BASE + 0x360 + 0x0); /* S5PC110_GPIO_MP0_5_OFFSET + S5PC1XX_GPIO_CON_OFFSET*/
-
-	val = readl(S5PC110_GPIO_BASE + 0x360 + 0x8); /* S5PC1XX_GPIO_PULL_OFFSET */
-	val &= (!(0x3 << 14)); /* 14 = 7 * 2-bit */
-	val |= (0x2 << 14); /* Pull-up enabled */
-	writel(val, S5PC110_GPIO_BASE + 0x360 + 0x8); /* S5PC1XX_GPIO_PULL_OFFSET */
-
+	/* TODO: Shouldn't be this low-level, but it's the only way I've found that works */
 	val = readl(S5PC110_GPIO_BASE + 0x360 + 0x4);  /* S5PC1XX_GPIO_DAT_OFFSET */
 	val |= (1 << 7); /* 7 = 7 * 1-bit */
 	writel(val, S5PC110_GPIO_BASE + 0x360 + 0x4); /* S5PC1XX_GPIO_DAT_OFFSET */
-
-	/* internal_ram_init */
-	writel(0, 0xF1500000);
-
-	/* Clear wakeup status register */
-	/* TODO - Why do we read this and then write the results back? */
-	val = readl(S5PC110_WAKEUP_STAT);
-	writel(val, S5PC110_WAKEUP_STAT);
-
-	/* IO retension release */
-	val = readl(S5PC110_OTHERS);
-	val |= ((1 << 31) | (1 << 30) | (1 << 29) | (1 << 28));
-	writel(val, S5PC110_OTHERS);
 
 	return 0;
 }
