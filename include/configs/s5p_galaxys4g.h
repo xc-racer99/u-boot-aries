@@ -20,6 +20,11 @@
 
 #define CONFIG_ARCH_CPU_INIT
 
+/* Disable all caches - enabling they causes slowdowns of ~50% in Linux */
+#define CONFIG_SYS_ICACHE_OFF
+#define CONFIG_SYS_DCACHE_OFF
+#define CONFIG_SYS_L2CACHE_OFF
+
 /* input clock of PLL: has 24MHz input clock at S5PC110 */
 #define CONFIG_SYS_CLK_FREQ_C110	24000000
 
