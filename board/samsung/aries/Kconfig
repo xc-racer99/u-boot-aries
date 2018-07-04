@@ -1,7 +1,7 @@
-if TARGET_S5P_GALAXYS4G
+if TARGET_S5P_ARIES
 
 config SYS_BOARD
-	default "galaxys4g"
+	default "aries"
 
 config SYS_VENDOR
 	default "samsung"
@@ -10,6 +10,6 @@ config SYS_SOC
 	default "s5pc1xx"
 
 config SYS_CONFIG_NAME
-	default "s5p_galaxys4g"
+	default "s5p_aries"
 
 endif

@@ -21,6 +21,8 @@
 
 #include <mach/power.h>
 
+#include "aries.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 u32 get_board_rev(void)
@@ -65,7 +67,7 @@ int board_early_init_f(void)
 int board_init(void)
 {
 	/* Set Initial global variables */
-	gd->bd->bi_arch_number = MACH_TYPE_GALAXYS4G;
+	gd->bd->bi_arch_number = MACH_TYPE_SAMSUNG_ARIES;
 	gd->bd->bi_boot_params = PHYS_SDRAM_1 + 0x100;
 
 	return 0;
@@ -104,7 +106,7 @@ int dram_init_banksize(void)
 #ifdef CONFIG_DISPLAY_BOARDINFO
 int checkboard(void)
 {
-	puts("Board:\tGalaxys4G\n");
+	puts("Board:\tAries\n");
 	return 0;
 }
 #endif
@@ -113,7 +115,7 @@ int checkboard(void)
 int board_mmc_init(bd_t *bis)
 {
 	struct udevice *dev;
-	int i, reg, ret = 0;
+	int i, reg, ret, ret_sd = 0;
 
 	/* Enable vmmc LDO */
 	ret = pmic_get("max8998-pmic", &dev);
@@ -131,6 +133,8 @@ int board_mmc_init(bd_t *bis)
 	}
 
 	/*
+	 * Register SD card first so it is device 0 on all variants
+	 *
 	 * SD card (T_FLASH) detect and init
 	 * T_FLASH_DETECT: EINT28: GPH3[4] input mode
 	 */
@@ -140,25 +144,52 @@ int board_mmc_init(bd_t *bis)
 
 	if (!gpio_get_value(S5PC110_GPIO_H34)) {
 		for (i = S5PC110_GPIO_G20; i < S5PC110_GPIO_G27; i++) {
-			if (i == S5PC110_GPIO_G22) {
-				gpio_set_drv(i, S5P_GPIO_DRV_2X);
+			if (i == S5PC110_GPIO_G22)
 				continue;
-			}
 
 			/* GPG2[0:6] special function 2 */
 			gpio_cfg_pin(i, 0x2);
 			/* GPG2[0:6] pull disable */
 			gpio_set_pull(i, S5P_GPIO_PULL_NONE);
-			/* GPG2[0:6] drv 2x */
-			gpio_set_drv(i, S5P_GPIO_DRV_2X);
+			/* GPG2[0:6] drv 4x */
+			gpio_set_drv(i, S5P_GPIO_DRV_4X);
 		}
 
-		ret = s5p_mmc_init(2, 4);
-		if (ret)
-			pr_err("MMC: Failed to init SD card (MMC:2).\n");
+		ret_sd = s5p_mmc_init(2, 4);
+		if (ret_sd)
+			pr_err("MMC: Failed to init SD card\n");
 	}
 
-	return ret;
+	/* Now register emmc for devices with it */
+	if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
+		/* MASSMEMORY_EN: XMSMDATA7: GPJ2[7] output high */
+		gpio_request(S5PC110_GPIO_J27, "massmemory_en");
+		gpio_direction_output(S5PC110_GPIO_J27, 1);
+
+		/*
+		 * MMC0 GPIO
+		 * GPG0[0]	SD_0_CLK
+		 * GPG0[1]	SD_0_CMD
+		 * GPG0[2]	SD_0_CDn	-> Not used
+		 * GPG0[3:6]	SD_0_DATA[0:3]
+		 */
+		for (i = S5PC110_GPIO_G00; i < S5PC110_GPIO_G07; i++) {
+			if (i == S5PC110_GPIO_G02)
+				continue;
+			/* GPG0[0:6] special function 2 */
+			gpio_cfg_pin(i, 0x2);
+			/* GPG0[0:6] pull disable */
+			gpio_set_pull(i, S5P_GPIO_PULL_NONE);
+			/* GPG0[0:6] drv 4x */
+			gpio_set_drv(i, S5P_GPIO_DRV_4X);
+		}
+
+		ret = s5p_mmc_init(0, 4);
+		if (ret)
+			pr_err("MMC: Failed to init emmc\n");
+	}
+
+	return ret & ret_sd;
 }
 #endif
 

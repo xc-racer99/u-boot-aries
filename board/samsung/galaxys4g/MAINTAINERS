@@ -1,6 +1,0 @@
-GALAXYS4G BOARD
-M:	Robert Baldyga <r.baldyga@samsung.com>
-S:	Maintained
-F:	board/samsung/galaxys4g/
-F:	include/configs/s5p_galaxys4g.h
-F:	configs/s5p_galaxys4g_defconfig

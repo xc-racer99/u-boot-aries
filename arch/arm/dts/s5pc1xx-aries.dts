@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Samsung's S5PC110-based Galaxy S 4G (SGH-T959P/SGH-T959V/SGH-T959W) board device tree source
+ * Samsung's S5PC110-based first generation Galaxy S common board device tree source
  *
  * Copyright (c) 2014 Google, Inc
  */
@@ -11,8 +11,8 @@
 #include "s5pc110-pinctrl.dtsi"
 
 / {
-	model = "Samsung Galaxy S 4G based on S5PC110";
-	compatible = "samsung,galaxys4g", "samsung,s5pc110";
+	model = "Samsung Aries based on S5PC110";
+	compatible = "samsung,aries", "samsung,s5pc110";
 
 	aliases {
 		serial2 = "/serial@e2900800";
@@ -195,5 +195,4 @@
 			};
 		};
 	};
-
 };

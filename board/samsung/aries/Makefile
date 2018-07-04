@@ -6,4 +6,4 @@
 # (C) Copyright 2008
 # Guennadi Liakhovetki, DENX Software Engineering, <lg@denx.de>
 
-obj-y	:= galaxys4g.o onenand.o
+obj-y	:= aries.o onenand.o board_detect.o
