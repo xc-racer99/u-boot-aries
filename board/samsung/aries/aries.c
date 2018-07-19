@@ -50,16 +50,9 @@ u32 get_board_rev(void)
 
 int board_early_init_f(void)
 {
-	int val;
-
-	gpio_request(S5PC110_GPIO_MP057, "uart_sel");
 	gpio_set_pull(S5PC110_GPIO_MP057, S5P_GPIO_PULL_UP);
-	gpio_direction_output(S5PC110_GPIO_MP057, 1);
-
-	/* TODO: Shouldn't be this low-level, but it's the only way I've found that works */
-	val = readl(S5PC110_GPIO_BASE + 0x360 + 0x4);  /* S5PC1XX_GPIO_DAT_OFFSET */
-	val |= (1 << 7); /* 7 = 7 * 1-bit */
-	writel(val, S5PC110_GPIO_BASE + 0x360 + 0x4); /* S5PC1XX_GPIO_DAT_OFFSET */
+	gpio_cfg_pin(S5PC110_GPIO_MP057, S5P_GPIO_INPUT);
+	gpio_set_value(S5PC110_GPIO_MP057, 1);
 
 	return 0;
 }
