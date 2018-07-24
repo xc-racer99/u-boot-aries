@@ -65,16 +65,9 @@
 #define CONFIG_G_DNL_UMS_VENDOR_NUM 0x0525
 #define CONFIG_G_DNL_UMS_PRODUCT_NUM 0xA4A5
 
-#define CONFIG_BOOTCOMMAND	"run android_3_0_boot;"
+#define CONFIG_BOOTCOMMAND	"bootmenu 2;"
 
 #define CONFIG_DEFAULT_CONSOLE	"ttySAC2,115200n8"
-
-#define CONFIG_COMMON_BOOT	"${console} ${meminfo} ${mtdparts} androidboot.serialno=${serial#} androidboot.mode=${boot_mode}"
-
-/* 3.0 Kernel sets serialno, mtdparts automatically/as needed */
-#define BOOTARGS_3_0		"${console} androidboot.mode=${boot_mode}"
-
-#define VOLUME_UP_KEY		"gph31"
 
 #define CONFIG_MISC_COMMON
 #define CONFIG_MISC_INIT_R
@@ -84,14 +77,11 @@
 	"boottrace=setenv opts initcall_debug; run bootcmd\0" \
 	"bootchart=set opts init=/sbin/bootchartd; run bootcmd\0" \
 	"console=" CONFIG_DEFAULT_CONSOLE "\0"\
+	"kernel_load_addr=0x32000000\0" \
 	"meminfo=mem=80M mem=256M@0x40000000 mem=128M@0x50000000\0" \
-	"normal_boot=onenand read 0x32000000 0x1980000 0xA00000; bootm 0x32000000\0" \
-	"recovery_boot=onenand read 0x32000000 0x2380000 0xA00000; bootm 0x32000000\0" \
-	"mmc_boot=fatload mmc 0 0x32000000 uImage-dtb; fatload mmc 0 0x33000000 initrd.img; bootm 0x32000000 0x33000000\0" \
-	"android_3_0_boot=set bootargs " BOOTARGS_3_0 "; run common_boot\0" \
-	"upstream_boot=set bootargs " CONFIG_COMMON_BOOT "; run common_boot\0" \
-	"common_boot=if gpio input " VOLUME_UP_KEY " || test ${boot_mode} = recovery; then run recovery_boot; else run normal_boot; fi\0"
-
+	"bootmenu_1=OneNAND Main Boot=onenand read ${kernel_load_addr} 0x1980000 0xA00000; bootm ${kernel_load_addr}\0" \
+	"bootmenu_2=OneNAND Recovery Boot=onenand read ${kernel_load_addr} 0x2380000 0xA00000; bootm ${kernel_load_addr}\0" \
+	"boot_mode=normal\0"
 
 #define CONFIG_SYS_PBSIZE	384	/* Print Buffer Size */
 /* memtest works on */

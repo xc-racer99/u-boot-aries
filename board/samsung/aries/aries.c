@@ -265,9 +265,77 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 	return 0;
 }
 
+int set_default_bootmenu(const char *def)
+{
+	size_t len = 11 + strlen(def);
+	char *buf = malloc(len);
+	if (!buf)
+		return -ENOMEM;
+	snprintf(buf, len, "%s%s", "Default - ", def);
+	env_set("bootmenu_0", buf);
+	free(buf);
+	return 0;
+}
+
+int setup_bootmenu(void)
+{
+	int vol_up;
+	int vol_down;
+
+	switch (cur_board) {
+		case BOARD_FASCINATE4G:
+		case BOARD_GALAXYS4G:
+		case BOARD_VIBRANT:
+			vol_up = S5PC110_GPIO_H31;
+			vol_down = S5PC110_GPIO_H32;
+			break;
+		case BOARD_FASCINATE:
+			vol_up = S5PC110_GPIO_H33;
+			vol_down = S5PC110_GPIO_H31;
+			break;
+		default:
+			vol_up = S5PC110_GPIO_H32;
+			vol_down = S5PC110_GPIO_H31;
+			break;
+	}
+
+	gpio_request(vol_up, "volume_up");
+	gpio_request(vol_down, "volume_down");
+
+	/* Check if powering on due to charger */
+	if (readl(S5PC110_INFORM5))
+		env_set("boot_mode", "charger");
+
+	/* Setup SD/MMC */
+	if (!gpio_get_value(S5PC110_GPIO_H34)) {
+		env_set("bootmenu_3", "SD Card Partition 1 Boot=ext4load mmc 0:1 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+		env_set("bootmenu_4", "SD Card Partition 2 Boot=ext4load mmc 0:2 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+		if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
+			env_set("bootmenu_5", "MMC Partition 1 Boot=ext4load mmc 1:1 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+			env_set("bootmenu_6", "MMC Partition 2 Boot=ext4load mmc 1:2 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+		}
+	} else if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
+		env_set("bootmenu_3", "MMC Partition 1 Boot=ext4load mmc 0:1 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+		env_set("bootmenu_4", "MMC Partition 2 Boot=ext4load mmc 0:2 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+	}
+
+	/* Choose default bootmenu */
+	if (readl(S5PC110_INFORM6) || !gpio_get_value(vol_down)) {
+		/* Recovery mode */
+		env_set("boot_mode", "recovery");
+
+		return set_default_bootmenu(env_get("bootmenu_2"));
+	} else if (!gpio_get_value(vol_up)) {
+		/* SD part 1 boot, or MMC part 1 if no SD */
+		return set_default_bootmenu(env_get("bootmenu_3"));
+	}
+
+	/* Default OneNAND boot */
+	return set_default_bootmenu(env_get("bootmenu_1"));
+}
+
 int board_late_init(void)
 {
-	int val;
 	uint64_t board_serial = 0;
 	char board_serial_str[17];
 
@@ -285,20 +353,5 @@ int board_late_init(void)
 		env_set("serial#", board_serial_str);
 	}
 
-	val = readl(S5PC110_INFORM5);
-
-	if (val) {
-		env_set("boot_mode", "charger");
-		return 0;
-	}
-
-	val = readl(S5PC110_INFORM6);
-
-	if (val == 6) {
-		env_set("boot_mode", "recovery");
-		return 0;
-	}
-
-	env_set("boot_mode", "normal");
-	return 0;
+	return setup_bootmenu();
 }
