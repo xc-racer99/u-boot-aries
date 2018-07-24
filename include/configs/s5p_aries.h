@@ -48,11 +48,6 @@
 /* Size of malloc() pool before and after relocation */
 #define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (80 << 20))
 
-/*
- * select serial console configuration
- */
-#define CONFIG_SERIAL2			1	/* use SERIAL2 */
-
 /* MMC */
 #define SDHCI_MAX_HOSTS			4
 
@@ -116,12 +111,9 @@
 #define CONFIG_SYS_MONITOR_BASE		0x00000000
 #define CONFIG_SYS_MONITOR_LEN		(256 << 10)	/* 256 KiB */
 
-/* FLASH and environment organization */
-#define CONFIG_MMC_DEFAULT_DEV		0
-#define CONFIG_SYS_MMC_ENV_DEV		CONFIG_MMC_DEFAULT_DEV
+/* Environment organization */
 #define CONFIG_ENV_SIZE			4096
 #define CONFIG_ENV_OFFSET		((32 - 4) << 10) /* 32KiB - 4KiB */
-#define CONFIG_ENV_OVERWRITE
 
 #define CONFIG_USE_ONENAND_BOARD_INIT
 #define CONFIG_SAMSUNG_ONENAND		1
