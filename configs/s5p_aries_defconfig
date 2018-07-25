@@ -6,8 +6,8 @@ CONFIG_DEFAULT_DEVICE_TREE="s5pc1xx-aries"
 CONFIG_ENV_VARS_UBOOT_CONFIG=y
 CONFIG_ANDROID_BOOT_IMAGE=y
 CONFIG_BOOTDELAY=0
-CONFIG_USE_BOOTARGS=y
-CONFIG_BOOTARGS="${console} ${meminfo} ${mtdparts} androidboot.mode=${boot_mode} androidboot.serialno=${serial#}"
+CONFIG_USE_BOOTCOMMAND=y
+CONFIG_BOOTCOMMAND="setenv bootargs ${console} ${mtdparts} androidboot.mode=${boot_mode} androidboot.serialno=${serial#}; bootmenu 2;"
 CONFIG_SYS_CONSOLE_IS_IN_ENV=y
 CONFIG_BOARD_EARLY_INIT_F=y
 CONFIG_HUSH_PARSER=y
