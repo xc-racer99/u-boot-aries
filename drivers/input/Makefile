@@ -10,5 +10,6 @@ obj-$(CONFIG_TEGRA_KEYBOARD) += tegra-kbc.o
 obj-$(CONFIG_TWL4030_INPUT) += twl4030.o
 obj-$(CONFIG_TWL6030_INPUT) += twl6030.o
 obj-$(CONFIG_CROS_EC_KEYB) += cros_ec_keyb.o
+obj-$(CONFIG_GPIO_KEYS) += gpio_keys_polled.o
 obj-y += input.o
 obj-$(CONFIG_$(SPL_)OF_CONTROL) += key_matrix.o
