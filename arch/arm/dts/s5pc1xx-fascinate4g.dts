@@ -7,9 +7,33 @@
 
 /dts-v1/;
 
+#include <dt-bindings/input/linux-event-codes.h>
 #include "s5pc1xx-aries.dts"
 
 / {
 	model = "Samsung Galaxy S Fascinate 4G based on S5PC110";
 	compatible = "samsung,fascinate4g", "samsung,s5pc110";
+
+	gpio-keys {
+		compatible = "gpio-keys";
+
+		power {
+			label = "power";
+			gpios = <&gph2 6 1>;
+			linux,code = <KEY_ENTER>;
+			wakeup-source;
+		};
+
+		vol-down {
+			label = "volume_down";
+			gpios = <&gph3 2 1>;
+			linux,code = <KEY_DOWN>;
+		};
+
+		vol-up {
+			label = "volume_up";
+			gpios = <&gph3 1 1>;
+			linux,code = <KEY_UP>;
+		};
+	};
 };

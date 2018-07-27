@@ -77,7 +77,7 @@
 	"console=" CONFIG_DEFAULT_CONSOLE "\0"\
 	"kernel_load_addr=0x32000000\0" \
 	"meminfo=mem=80M mem=256M@0x40000000 mem=128M@0x50000000\0" \
-	"stdin=serial\0" \
+	"stdin=serial,gpio-keys\0" \
 	"stdout=serial,vidconsole\0" \
 	"stderr=serial,vidconsole\0" \
 	"bootmenu_1=OneNAND Main Boot=onenand read ${kernel_load_addr} 0x1980000 0xA00000; bootm ${kernel_load_addr}\0" \
