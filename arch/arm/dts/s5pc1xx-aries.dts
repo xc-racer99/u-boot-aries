@@ -195,4 +195,12 @@
 			};
 		};
 	};
+
+	framebuffer {
+		compatible = "simple-framebuffer";
+		reg = <0x4ec00000 0x177000>;
+		width = <480>;
+		height = <800>;
+		format = "a8b8g8r8";
+	};
 };
