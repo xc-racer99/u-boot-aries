@@ -14,6 +14,12 @@ config CROS_EC_KEYB
 	  Messages are used to request key scans from the EC and these are
 	  then decoded into keys by this driver.
 
+config GPIO_KEYS
+	bool "Enable polled gpio keys"
+	depends on DM_KEYBOARD
+	help
+	  Some devices can use keys controlled that can be polled via GPIO.
+
 config I8042_KEYB
 	bool "Enable Intel i8042 keyboard support"
 	depends on DM_KEYBOARD
