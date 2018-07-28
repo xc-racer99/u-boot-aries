@@ -14,6 +14,8 @@
 #include <video_console.h>
 #include <video_font.h>		/* Bitmap font for code page 437 */
 
+#define DEBUG
+
 /*
  * Structure to describe a console color
  */
@@ -173,6 +175,8 @@ static char *parsenum(char *s, int *num)
 static void vidconsole_escape_char(struct udevice *dev, char ch)
 {
 	struct vidconsole_priv *priv = dev_get_uclass_priv(dev);
+	struct udevice *vid_dev = dev->parent;
+	struct video_priv *vid_priv = dev_get_uclass_priv(vid_dev);
 
 	if (!IS_ENABLED(CONFIG_VIDEO_ANSI))
 		goto error;
@@ -242,6 +246,27 @@ static void vidconsole_escape_char(struct udevice *dev, char ch)
 		} else {
 			debug("unsupported clear mode: %d\n", mode);
 		}
+		break;
+	}
+	case 'K': {
+		int mode;
+
+		/*
+		 * Clear part/all screen:
+		 *   [K or [0K - clear screen from cursor to end of line
+		 *   [1K       - clear screen from cursor to start of line
+		 *   [2K       - clear entire line
+		 *
+		 * TODO we really only handle entire-line case, others
+		 * probably require some additions to video-uclass (and
+		 * are not really needed yet by anything)
+		 */
+		parsenum(priv->escape_buf + 1, &mode);
+
+		if (mode == 2)
+			vidconsole_set_row(dev, priv->ycur / priv->y_charsize, vid_priv->colour_bg);
+		else
+			debug("unsupported clear mode: %d\n", mode);
 		break;
 	}
 	case 'm': {
