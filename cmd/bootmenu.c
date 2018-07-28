@@ -58,22 +58,25 @@ static char *bootmenu_getoption(unsigned short int n)
 static void bootmenu_print_entry(void *data)
 {
 	struct bootmenu_entry *entry = data;
-	int reverse = (entry->menu->active == entry->num);
+	int active = (entry->menu->active == entry->num);
 
 	/*
-	 * Move cursor to line where the entry will be drown (entry->num)
+	 * Move cursor to line where the entry will be drawn (entry->num)
 	 * First 3 lines contain bootmenu header + 1 empty line
 	 */
 	printf(ANSI_CURSOR_POSITION, entry->num + 4, 1);
 
-	puts("     ");
+	if (active)
+		puts("   * ");
+	else
+		puts("     ");
 
-	if (reverse)
+	if (active)
 		puts(ANSI_COLOR_REVERSE);
 
 	puts(entry->title);
 
-	if (reverse)
+	if (active)
 		puts(ANSI_COLOR_RESET);
 }
 
