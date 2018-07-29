@@ -310,13 +310,16 @@ int setup_bootmenu(void)
 	if (!gpio_get_value(S5PC110_GPIO_H34)) {
 		env_set("bootmenu_3", "SD Card Partition 1 Boot=ext4load mmc 0:1 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
 		env_set("bootmenu_4", "SD Card Partition 2 Boot=ext4load mmc 0:2 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+		env_set("bootmenu_5", "SD Card - Mass Storage=ums 0 mmc 0;");
 		if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
-			env_set("bootmenu_5", "MMC Partition 1 Boot=ext4load mmc 1:1 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
-			env_set("bootmenu_6", "MMC Partition 2 Boot=ext4load mmc 1:2 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+			env_set("bootmenu_6", "MMC Partition 1 Boot=ext4load mmc 1:1 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+			env_set("bootmenu_7", "MMC Partition 2 Boot=ext4load mmc 1:2 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+			env_set("bootmenu_8", "MMC - Mass Storage=ums 0 mmc 1;");
 		}
 	} else if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
 		env_set("bootmenu_3", "MMC Partition 1 Boot=ext4load mmc 0:1 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
 		env_set("bootmenu_4", "MMC Partition 2 Boot=ext4load mmc 0:2 ${kernel_load_addr} uImage; bootm ${kernel_load_addr};");
+		env_set("bootmenu_5", "MMC - Mass Storage=ums 0 mmc 0;");
 	}
 
 	/* Choose default bootmenu */
