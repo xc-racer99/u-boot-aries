@@ -29,6 +29,9 @@
 /* DRAM Base */
 #define CONFIG_SYS_SDRAM_BASE		0x30000000
 
+/* Max u-boot.bin size - 3 256K OneNAND pages */
+#define CONFIG_BOARD_SIZE_LIMIT		0xC0000
+
 /*
  * Machine type - as defined in 3.0 Android kernel
  * Stock (Froyo/Gingerbread - 2.6) used 2193 which
@@ -77,6 +80,9 @@
 	"console=" CONFIG_DEFAULT_CONSOLE "\0"\
 	"kernel_load_addr=0x32000000\0" \
 	"fdt_load_addr=0x33000000\0" \
+	"uboot_load_addr=0x33000000\0" \
+	"uboot_onenand_off=0x1200000\0" \
+	"uboot_onenand_size="__stringify(CONFIG_BOARD_SIZE_LIMIT)"\0" \
 	"meminfo=mem=80M mem=256M@0x40000000 mem=128M@0x50000000\0" \
 	"stdin=serial,gpio-keys\0" \
 	"stdout=serial,vidconsole\0" \
@@ -99,6 +105,14 @@
 		" rootwait ${console} ${meminfo} ${opts};\0" \
 	"sddev=1\0" \
 	"rootdev=1\0" \
+	"uboot_update=if test -e mmc 0:1 u-boot.bin; then "\
+		"load mmc 0:1 ${uboot_load_addr} u-boot.bin; "\
+		"if onenand checkbad ${uboot_onenand_off} ${uboot_onenand_size}; "\
+			"then onenand erase ${uboot_onenand_off} ${uboot_onenand_size}; "\
+			"onenand write ${uboot_load_addr} ${uboot_onenand_off} ${uboot_onenand_size}; echo Success!; " \
+			"else echo OneNAND contains bad blocks, must use Odin/Heimdall; " \
+		"fi;" \
+		"else echo u-boot.bin not present, not updating; fi;\0" \
 	"mmcdev=0\0" \
 	"mmcpart=1\0" \
 	"mmcboot="\
