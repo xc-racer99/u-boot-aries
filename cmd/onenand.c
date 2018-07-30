@@ -302,6 +302,47 @@ next:
 	return 0;
 }
 
+static int onenand_checkbad(u32 start, u32 size)
+{
+	struct onenand_chip *this = mtd->priv;
+
+	int blocks;
+	loff_t ofs;
+	int blocksize = 1 << this->erase_shift;
+	int start_block, end_block;
+	int ret;
+
+	start_block = start >> this->erase_shift;
+	end_block = (start + size) >> this->erase_shift;
+
+	/* Protect boot-loader from badblock testing */
+	if (start_block < 2)
+		start_block = 2;
+
+	if (end_block > (mtd->size >> this->erase_shift))
+		end_block = mtd->size >> this->erase_shift;
+
+	blocks = start_block;
+	ofs = start;
+	while (blocks < end_block) {
+		printf("Testing block %d at 0x%x\n", (u32)(ofs >> this->erase_shift), (u32)ofs);
+
+		ret = mtd_block_isbad(mtd, ofs);
+		if (ret) {
+			printf("Bad block %d at 0x%x\n",
+			       (u32)(ofs >> this->erase_shift), (u32)ofs);
+			return 1;
+		}
+
+		ofs += blocksize;
+		blocks++;
+	}
+
+	printf("No bad blocks\n");
+
+	return 0;
+}
+
 static int onenand_dump(struct mtd_info *mtd, ulong off, int only_oob)
 {
 	int i;
@@ -377,6 +418,25 @@ static int do_onenand_bad(cmd_tbl_t * cmdtp, int flag, int argc, char * const ar
 	}
 
 	return 0;
+}
+
+static int do_onenand_checkbad(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
+{
+	ulong ofs;
+	size_t len;
+
+	/*
+	 * Syntax is:
+	 *   0       1         2   3
+	 *   onenand checkbad  off size
+	 */
+
+	printf("\nOneNAND checkbad: ");
+
+	if (arg_off_size_onenand(argc - 1, argv + 1, &ofs, &len) != 0)
+		return CMD_RET_USAGE;
+
+	return onenand_checkbad(ofs, len);
 }
 
 static int do_onenand_read(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
@@ -548,6 +608,7 @@ static int do_onenand_markbad(cmd_tbl_t * cmdtp, int flag, int argc, char * cons
 static cmd_tbl_t cmd_onenand_sub[] = {
 	U_BOOT_CMD_MKENT(info, 1, 0, do_onenand_info, "", ""),
 	U_BOOT_CMD_MKENT(bad, 1, 0, do_onenand_bad, "", ""),
+	U_BOOT_CMD_MKENT(checkbad, 3, 0, do_onenand_checkbad, "", ""),
 	U_BOOT_CMD_MKENT(read, 4, 0, do_onenand_read, "", ""),
 	U_BOOT_CMD_MKENT(write, 4, 0, do_onenand_write, "", ""),
 	U_BOOT_CMD_MKENT(write.yaffs, 4, 0, do_onenand_write, "", ""),
@@ -589,6 +650,7 @@ U_BOOT_CMD(
 	"OneNAND sub-system",
 	"info - show available OneNAND devices\n"
 	"onenand bad - show bad blocks\n"
+	"onenand checkbad off size - test 'size' bytes from offset off\n"
 	"onenand read[.oob] addr off size\n"
 	"onenand write[.yaffs] addr off size\n"
 	"    read/write 'size' bytes starting at offset 'off'\n"
