@@ -83,10 +83,8 @@
 	"mmcdev=0\0" \
 	"mmcpart=1\0" \
 	"mmcboot="\
-		"ext4load mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} uImage "\
-		"|| ext4load mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} /boot/uImage "\
-		"|| fatload mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} uImage "\
-		"|| fatload mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} /boot/uImage; "\
+		"load mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} uImage "\
+		"|| load mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} /boot/uImage; "\
 		"bootm ${kernel_load_addr}\0"\
 	"bootmenu_1=OneNAND Main Boot=onenand read ${kernel_load_addr} 0x1980000 0xA00000; bootm ${kernel_load_addr}\0" \
 	"bootmenu_2=OneNAND Recovery Boot=onenand read ${kernel_load_addr} 0x2380000 0xA00000; bootm ${kernel_load_addr}\0" \
