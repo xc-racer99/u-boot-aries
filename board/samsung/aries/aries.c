@@ -25,6 +25,17 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+static const char *board_linux_fdt_name[BOARD_MAX] = {
+	[BOARD_UNKNOWN] = "s5pv210-aries.dtb",
+	[BOARD_CAPTIVATE] = "s5pv210-aries.dtb",
+	[BOARD_FASCINATE] = "s5pv210-aries.dtb",
+	[BOARD_FASCINATE4G] = "s5pv210-fascinate4g.dtb",
+	[BOARD_GALAXYS] = "s5pv210-galaxys.dtb",
+	[BOARD_GALAXYS4G] = "s5pv210-fascinate4g.dtb",
+	[BOARD_GALAXYSB] = "s5pv210-aries.dtb",
+	[BOARD_VIBRANT] = "s5pv210-aries.dtb",
+};
+
 u32 get_board_rev(void)
 {
 	int i;
@@ -255,6 +266,7 @@ int misc_init_r(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	set_board_info();
+	env_set("fdtfile", board_linux_fdt_name[cur_board]);
 #endif
 	return 0;
 }
