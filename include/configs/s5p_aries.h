@@ -102,7 +102,7 @@
 		"|| load mmc ${mmcdev}:${mmcpart} ${fdt_load_addr} /boot/${fdtfile};\0" \
 	"setup_kernel_args=" \
 		"setenv bootargs root=/dev/mmcblk${rootdev}p${mmcpart}" \
-		" rootwait rw ${console} ${meminfo} ${opts};\0" \
+		" rootwait rw ${console} ${meminfo} ${opts} mtdparts=${mtdparts} ubi.mtd=ubi;\0" \
 	"sddev=1\0" \
 	"rootdev=1\0" \
 	"uboot_update=if test -e mmc 0:1 u-boot.bin; then "\
@@ -143,8 +143,8 @@
 #define CONFIG_SYS_MONITOR_LEN		(256 << 10)	/* 256 KiB */
 
 /* Environment organization */
-#define CONFIG_ENV_SIZE			4096
-#define CONFIG_ENV_OFFSET		((32 - 4) << 10) /* 32KiB - 4KiB */
+#define CONFIG_ENV_SIZE			(256 << 10) /* 256k */
+#define CONFIG_ENV_ADDR			(25856 << 10) /* 25856k */
 
 #define CONFIG_USE_ONENAND_BOARD_INIT
 #define CONFIG_SYS_ONENAND_BASE		0xB0000000
