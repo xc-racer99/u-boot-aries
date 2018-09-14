@@ -76,16 +76,34 @@
 	"bootchart=set opts init=/sbin/bootchartd; run bootcmd\0" \
 	"console=" CONFIG_DEFAULT_CONSOLE "\0"\
 	"kernel_load_addr=0x32000000\0" \
+	"fdt_load_addr=0x33000000\0" \
 	"meminfo=mem=80M mem=256M@0x40000000 mem=128M@0x50000000\0" \
 	"stdin=serial,gpio-keys\0" \
 	"stdout=serial,vidconsole\0" \
 	"stderr=serial,vidconsole\0" \
+	"opts=ignore_loglevel earlyprintk\0" \
+	"check_dtb=" \
+		"if run loaddtb; then " \
+			"setenv fdt_addr ${fdt_load_addr};" \
+		"else " \
+			"setenv fdt_addr;" \
+		"fi;\0" \
+	"loadkernel=" \
+		"load mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} uImage "\
+		"|| load mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} /boot/uImage;\0" \
+	"loaddtb=" \
+		"load mmc ${mmcdev}:${mmcpart} ${fdt_load_addr} ${fdtfile} "\
+		"|| load mmc ${mmcdev}:${mmcpart} ${fdt_load_addr} /boot/${fdtfile};\0" \
+	"setup_kernel_args=" \
+		"setenv bootargs root=/dev/mmcblk${mmcdev}p${mmcpart}" \
+		" rootwait ${console} ${meminfo} ${opts};\0" \
 	"mmcdev=0\0" \
 	"mmcpart=1\0" \
 	"mmcboot="\
-		"load mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} uImage "\
-		"|| load mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} /boot/uImage; "\
-		"bootm ${kernel_load_addr}\0"\
+		"run check_dtb;" \
+		"run loadkernel;" \
+		"run setup_kernel_args;" \
+		"bootm ${kernel_load_addr} - ${fdt_addr}\0"\
 	"bootmenu_1=OneNAND Main Boot=onenand read ${kernel_load_addr} 0x1980000 0xA00000; bootm ${kernel_load_addr}\0" \
 	"bootmenu_2=OneNAND Recovery Boot=onenand read ${kernel_load_addr} 0x2380000 0xA00000; bootm ${kernel_load_addr}\0" \
 	"boot_mode=normal\0"
