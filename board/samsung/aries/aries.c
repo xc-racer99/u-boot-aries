@@ -271,9 +271,11 @@ int misc_init_r(void)
 		case BOARD_FASCINATE4G:
 		case BOARD_GALAXYS4G:
 			env_set("sddev", "1");
+			env_set("mtdparts", "b0600000.onenand:256k@25856k(uboot-env),10240k(boot),10240k(recovery),980480k(ubi)");
 			break;
 		default:
 			env_set("sddev", "2");
+			env_set("mtdparts", "b0600000.onenand:256k@25856k(uboot-env),10240k(boot),10240k(recovery),466432k(ubi)");
 			break;
 	}
 #endif
