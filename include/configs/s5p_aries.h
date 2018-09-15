@@ -102,7 +102,7 @@
 		"|| load mmc ${mmcdev}:${mmcpart} ${fdt_load_addr} /boot/${fdtfile};\0" \
 	"setup_kernel_args=" \
 		"setenv bootargs root=/dev/mmcblk${rootdev}p${mmcpart}" \
-		" rootwait ${console} ${meminfo} ${opts};\0" \
+		" rootwait rw ${console} ${meminfo} ${opts};\0" \
 	"sddev=1\0" \
 	"rootdev=1\0" \
 	"uboot_update=if test -e mmc 0:1 u-boot.bin; then "\
