@@ -95,8 +95,10 @@
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_load_addr} ${fdtfile} "\
 		"|| load mmc ${mmcdev}:${mmcpart} ${fdt_load_addr} /boot/${fdtfile};\0" \
 	"setup_kernel_args=" \
-		"setenv bootargs root=/dev/mmcblk${mmcdev}p${mmcpart}" \
+		"setenv bootargs root=/dev/mmcblk${rootdev}p${mmcpart}" \
 		" rootwait ${console} ${meminfo} ${opts};\0" \
+	"sddev=1\0" \
+	"rootdev=1\0" \
 	"mmcdev=0\0" \
 	"mmcpart=1\0" \
 	"mmcboot="\

@@ -267,6 +267,15 @@ int misc_init_r(void)
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	set_board_info();
 	env_set("fdtfile", board_linux_fdt_name[cur_board]);
+	switch(cur_board) {
+		case BOARD_FASCINATE4G:
+		case BOARD_GALAXYS4G:
+			env_set("sddev", "1");
+			break;
+		default:
+			env_set("sddev", "2");
+			break;
+	}
 #endif
 	return 0;
 }
@@ -320,17 +329,17 @@ int setup_bootmenu(void)
 
 	/* Setup SD/MMC */
 	if (!gpio_get_value(S5PC110_GPIO_H34)) {
-		env_set("bootmenu_3", "SD Card Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; run mmcboot;");
-		env_set("bootmenu_4", "SD Card Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; run mmcboot;");
+		env_set("bootmenu_3", "SD Card Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev ${sddev}; run mmcboot;");
+		env_set("bootmenu_4", "SD Card Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev ${sddev}; run mmcboot;");
 		env_set("bootmenu_5", "SD Card - Mass Storage=ums 0 mmc 0;");
 		if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
-			env_set("bootmenu_6", "MMC Partition 1 Boot=setenv mmcdev 1; setenv mmcpart 1; run mmcboot;");
-			env_set("bootmenu_7", "MMC Partition 2 Boot=setenv mmcdev 1; setenv mmcpart 2; run mmcboot;");
+			env_set("bootmenu_6", "MMC Partition 1 Boot=setenv mmcdev 1; setenv mmcpart 1; setenv rootdev 0; run mmcboot;");
+			env_set("bootmenu_7", "MMC Partition 2 Boot=setenv mmcdev 1; setenv mmcpart 2; setenv rootdev 0; run mmcboot;");
 			env_set("bootmenu_8", "MMC - Mass Storage=ums 0 mmc 1;");
 		}
 	} else if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
-		env_set("bootmenu_3", "MMC Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; run mmcboot;");
-		env_set("bootmenu_4", "MMC Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; run mmcboot;");
+		env_set("bootmenu_3", "MMC Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev 0; run mmcboot;");
+		env_set("bootmenu_4", "MMC Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev 0; run mmcboot;");
 		env_set("bootmenu_5", "MMC - Mass Storage=ums 0 mmc 0;");
 	}
 
