@@ -26,6 +26,9 @@
 #ifdef CONFIG_FASTBOOT_FLASH_NAND_DEV
 #include <fb_nand.h>
 #endif
+#ifdef CONFIG_FASTBOOT_FLASH_ONENAND
+#include <fb_onenand.h>
+#endif
 
 #define FASTBOOT_VERSION		"0.4"
 
@@ -610,6 +613,11 @@ static void cb_flash(struct usb_ep *ep, struct usb_request *req)
 			    (void *)CONFIG_FASTBOOT_BUF_ADDR,
 			    download_bytes);
 #endif
+#ifdef CONFIG_FASTBOOT_FLASH_ONENAND
+	fb_onenand_flash_write(cmd,
+			    (void *)CONFIG_FASTBOOT_BUF_ADDR,
+			    download_bytes);
+#endif
 	fastboot_tx_write_str(response);
 }
 #endif
@@ -658,6 +666,9 @@ static void cb_erase(struct usb_ep *ep, struct usb_request *req)
 #endif
 #ifdef CONFIG_FASTBOOT_FLASH_NAND_DEV
 	fb_nand_erase(cmd);
+#endif
+#ifdef CONFIG_FASTBOOT_FLASH_ONENAND
+	fb_onenand_erase(cmd);
 #endif
 	fastboot_tx_write_str(response);
 }

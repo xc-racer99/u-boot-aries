@@ -119,6 +119,9 @@ endif
 ifdef CONFIG_FASTBOOT_FLASH_NAND_DEV
 obj-y += fb_nand.o
 endif
+ifdef CONFIG_FASTBOOT_FLASH_ONENAND
+obj-y += fb_onenand.o
+endif
 endif
 endif
 
