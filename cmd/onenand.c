@@ -58,7 +58,7 @@ static int arg_off_size_onenand(int argc, char * const argv[], ulong *off,
 	return 0;
 }
 
-static int onenand_block_read(loff_t from, size_t len,
+int onenand_block_read(loff_t from, size_t len,
 			      size_t *retlen, u_char *buf, int oob)
 {
 	struct onenand_chip *this = mtd->priv;
@@ -105,7 +105,7 @@ static int onenand_block_read(loff_t from, size_t len,
 	return 0;
 }
 
-static int onenand_write_oneblock_withoob(loff_t to, const u_char * buf,
+int onenand_write_oneblock_withoob(loff_t to, const u_char * buf,
 					  size_t *retlen)
 {
 	struct mtd_oob_ops ops = {
@@ -129,7 +129,7 @@ static int onenand_write_oneblock_withoob(loff_t to, const u_char * buf,
 	return ret;
 }
 
-static int onenand_block_write(loff_t to, size_t len,
+int onenand_block_write(loff_t to, size_t len,
 			       size_t *retlen, const u_char * buf, int withoob)
 {
 	struct onenand_chip *this = mtd->priv;
@@ -183,7 +183,7 @@ next:
 	return 0;
 }
 
-static int onenand_block_erase(u32 start, u32 size, int force)
+int onenand_block_erase(u32 start, u32 size, int force)
 {
 	struct onenand_chip *this = mtd->priv;
 	struct erase_info instr = {
