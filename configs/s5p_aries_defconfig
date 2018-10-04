@@ -7,7 +7,7 @@ CONFIG_NR_DRAM_BANKS=3
 CONFIG_ANDROID_BOOT_IMAGE=y
 CONFIG_BOOTDELAY=0
 CONFIG_USE_BOOTCOMMAND=y
-CONFIG_BOOTCOMMAND="setenv bootargs ${console} mtdparts=${mtdparts} ubi.mtd=ubi androidboot.mode=${boot_mode} androidboot.serialno=${serial#}; bootmenu 2;"
+CONFIG_BOOTCOMMAND="setenv bootargs ${console} ${mtdparts} ubi.mtd=ubi androidboot.mode=${boot_mode} androidboot.serialno=${serial#}; bootmenu 1;"
 CONFIG_MISC_INIT_R=y
 CONFIG_BOARD_EARLY_INIT_F=y
 CONFIG_HUSH_PARSER=y
@@ -34,6 +34,7 @@ CONFIG_CMD_EXT4_WRITE=y
 CONFIG_CMD_FAT=y
 CONFIG_CMD_FS_GENERIC=y
 CONFIG_CMD_MTDPARTS=y
+CONFIG_MTDIDS_DEFAULT="onenand0=b0600000.onenand"
 CONFIG_DEFAULT_DEVICE_TREE="s5pc1xx-aries"
 CONFIG_OF_LIST="s5pc1xx-aries s5pc1xx-fascinate4g s5pc1xx-galaxys"
 CONFIG_MULTI_DTB_FIT=y
@@ -46,6 +47,9 @@ CONFIG_DM_KEYBOARD=y
 CONFIG_GPIO_KEYS=y
 CONFIG_MMC_SDHCI=y
 CONFIG_MMC_SDHCI_S5P=y
+CONFIG_MTD=y
+CONFIG_MTD_DEVICE=y
+CONFIG_MTD_PARTITIONS=y
 CONFIG_DM_PMIC=y
 CONFIG_DM_PMIC_MAX8998=y
 CONFIG_USB=y
