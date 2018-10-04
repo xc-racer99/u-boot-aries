@@ -7,7 +7,7 @@ CONFIG_ENV_VARS_UBOOT_CONFIG=y
 CONFIG_ANDROID_BOOT_IMAGE=y
 CONFIG_BOOTDELAY=0
 CONFIG_USE_BOOTCOMMAND=y
-CONFIG_BOOTCOMMAND="setenv bootargs ${console} mtdparts=${mtdparts} ubi.mtd=ubi androidboot.mode=${boot_mode} androidboot.serialno=${serial#}; bootmenu 2;"
+CONFIG_BOOTCOMMAND="setenv bootargs ${console} ${mtdparts} ubi.mtd=ubi androidboot.mode=${boot_mode} androidboot.serialno=${serial#}; bootmenu 1;"
 CONFIG_BOARD_EARLY_INIT_F=y
 CONFIG_HUSH_PARSER=y
 # CONFIG_AUTO_COMPLETE is not set
