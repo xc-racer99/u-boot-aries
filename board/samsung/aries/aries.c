@@ -339,14 +339,17 @@ int setup_bootmenu(void)
 			env_set("bootmenu_6", "MMC Partition 1 Boot=setenv mmcdev 1; setenv mmcpart 1; setenv rootdev 0; run mmcboot;");
 			env_set("bootmenu_7", "MMC Partition 2 Boot=setenv mmcdev 1; setenv mmcpart 2; setenv rootdev 0; run mmcboot;");
 			env_set("bootmenu_8", "MMC - Mass Storage=ums 0 mmc 1;");
-			env_set("bootmenu_9", uboot_cmd);
+			env_set("bootmenu_9", "Fastboot=fastboot 0; bootd;");
+			env_set("bootmenu_10", uboot_cmd);
 		} else {
-			env_set("bootmenu_6", uboot_cmd);
+			env_set("bootmenu_6", "Fastboot=fastboot 0; bootd;");
+			env_set("bootmenu_7", uboot_cmd);
 		}
 	} else if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
 		env_set("bootmenu_3", "MMC Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev 0; run mmcboot;");
 		env_set("bootmenu_4", "MMC Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev 0; run mmcboot;");
 		env_set("bootmenu_5", "MMC - Mass Storage=ums 0 mmc 0;");
+		env_set("bootmenu_6", "Fastboot=fastboot 0; bootd;");
 	}
 
 	/* Choose default bootmenu */
