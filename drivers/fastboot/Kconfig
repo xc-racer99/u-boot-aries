@@ -82,6 +82,10 @@ config FASTBOOT_FLASH_NAND
 	bool "FASTBOOT on NAND"
 	depends on NAND && CMD_MTDPARTS
 
+config FASTBOOT_FLASH_ONENAND
+	bool "FASTBOOT on ONENAND"
+	depends on CMD_ONENAND && CMD_MTDPARTS
+
 endchoice
 
 config FASTBOOT_FLASH_MMC_DEV

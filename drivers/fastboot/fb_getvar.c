@@ -8,6 +8,7 @@
 #include <fastboot-internal.h>
 #include <fb_mmc.h>
 #include <fb_nand.h>
+#include <fb_onenand.h>
 #include <fs.h>
 #include <version.h>
 
@@ -175,6 +176,13 @@ static void getvar_partition_size(char *part_name, char *response)
 	struct part_info *part_info;
 
 	r = fastboot_nand_get_part_info(part_name, &part_info, response);
+	if (r >= 0)
+		size = part_info->size;
+#endif
+#if CONFIG_IS_ENABLED(FASTBOOT_FLASH_ONENAND)
+	struct part_info *part_info;
+
+	r = fastboot_onenand_get_part_info(part_name, &part_info, response);
 	if (r >= 0)
 		size = part_info->size;
 #endif
