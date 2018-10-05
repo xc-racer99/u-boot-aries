@@ -261,6 +261,7 @@ int onenand_checkbad(struct mtd_info *mtd, u32 start, u32 size)
 	loff_t ofs;
 	int blocksize = 1 << this->erase_shift;
 	int start_block, end_block;
+	int badblocks = 0;
 	int ret;
 
 	start_block = start >> this->erase_shift;
@@ -282,16 +283,17 @@ int onenand_checkbad(struct mtd_info *mtd, u32 start, u32 size)
 		if (ret) {
 			printf("Bad block %d at 0x%x\n",
 			       (u32)(ofs >> this->erase_shift), (u32)ofs);
-			return 1;
+			badblocks++;
 		}
 
 		ofs += blocksize;
 		blocks++;
 	}
 
-	printf("No bad blocks\n");
+	if (badblocks == 0)
+		printf("No bad blocks\n");
 
-	return 0;
+	return badblocks;
 }
 
 int onenand_dump(struct mtd_info *mtd, ulong off, int only_oob)
