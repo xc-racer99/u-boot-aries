@@ -11,6 +11,7 @@
 #include <image-sparse.h>
 
 #include <linux/mtd/mtd.h>
+#include <linux/mtd/onenand.h>
 #include <jffs2/jffs2.h>
 #include <onenand_uboot.h>
 
@@ -122,6 +123,7 @@ void fastboot_onenand_flash_write(const char *cmd, void *download_buffer,
 {
 	struct part_info *part;
 	struct mtd_info *mtd = NULL;
+	struct onenand_chip *this;
 	size_t retlen;
 	int ret;
 
@@ -131,6 +133,8 @@ void fastboot_onenand_flash_write(const char *cmd, void *download_buffer,
 		fastboot_fail("invalid OneNAND device", response);
 		return;
 	}
+
+	this = mtd->priv;
 
 	if (is_sparse_image(download_buffer)) {
 		struct fb_onenand_sparse sparse_priv;
@@ -164,6 +168,9 @@ void fastboot_onenand_flash_write(const char *cmd, void *download_buffer,
 			fastboot_fail("error erasing prior to writing image", response);
 			return;
 		}
+
+		/* Align to page size */
+		download_bytes = ALIGN(download_bytes, (1 << this->erase_shift));
 
 		ret = onenand_block_write(mtd, part->offset, download_bytes, &retlen, download_buffer, 0);
 
