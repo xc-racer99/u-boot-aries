@@ -48,6 +48,18 @@ extern int flexonenand_region(struct mtd_info *mtd, loff_t addr);
 extern int flexonenand_set_boundary(struct mtd_info *mtd, int die,
 					int boundary, int lock);
 
+/* utils */
+int onenand_block_read(struct mtd_info *mtd, loff_t from, size_t len,
+			      size_t *retlen, u_char *buf, int oob);
+int onenand_write_oneblock_withoob(struct mtd_info *mtd, loff_t to, const u_char * buf,
+				   size_t *retlen);
+int onenand_block_write(struct mtd_info *mtd, loff_t to, size_t len,
+			size_t *retlen, const u_char * buf, int withoob);
+int onenand_block_erase(struct mtd_info *mtd, u32 start, u32 size, int force);
+int onenand_block_test(struct mtd_info *mtd, u32 start, u32 size);
+int onenand_checkbad(struct mtd_info *mtd, u32 start, u32 size);
+int onenand_dump(struct mtd_info *mtd, ulong off, int only_oob);
+
 /* SPL */
 int onenand_spl_read_block(int block, int offset, int len, void *dst);
 void onenand_spl_load_image(uint32_t offs, uint32_t size, void *dst);
