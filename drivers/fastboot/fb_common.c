@@ -30,6 +30,25 @@ u32 fastboot_buf_size;
 void (*fastboot_progress_callback)(const char *msg);
 
 /**
+ * Finds supported flash backend by partition name
+ */
+struct fb_flash_driver *fastboot_find_supported_flash_driver(char *part_name)
+{
+	struct fb_flash_driver *drv;
+	const int n_ents = ll_entry_count(struct fb_flash_driver, fb_flash_driver);
+	struct fb_flash_driver *entry;
+
+	drv = ll_entry_start(struct fb_flash_driver, fb_flash_driver);
+	for (entry = drv; entry != drv + n_ents; entry++) {
+		if (entry->support_part(part_name))
+			return entry;
+	}
+
+	/* Not found */
+	return NULL;
+}
+
+/**
  * fastboot_response() - Writes a response of the form "$tag$reason".
  *
  * @tag: The first part of the response

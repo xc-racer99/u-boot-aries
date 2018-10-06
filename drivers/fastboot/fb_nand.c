@@ -152,7 +152,7 @@ static lbaint_t fb_nand_sparse_reserve(struct sparse_storage *info,
  * @part_info: Pointer to returned part_info pointer
  * @response: Pointer to fastboot response buffer
  */
-int fastboot_nand_get_part_info(char *part_name, struct part_info **part_info,
+int fastboot_nand_get_part_info(const char *part_name, struct part_info **part_info,
 				char *response)
 {
 	struct mtd_info *mtd = NULL;
@@ -259,3 +259,46 @@ void fastboot_nand_erase(const char *cmd, char *response)
 
 	fastboot_okay(NULL, response);
 }
+
+bool fastboot_nand_support_part(const char *part_name)
+{
+	struct mtd_device *dev;
+	struct part_info *part_info;
+	int ret;
+	u8 pnum;
+
+	ret = mtdparts_init();
+	if (ret)
+		return false;
+
+	ret = find_dev_and_part(part_name, &dev, &pnum, &part_info);
+	if (ret)
+		return false;
+
+	if (dev->id->type != MTD_DEV_TYPE_NAND)
+		return false;
+
+	return true;
+}
+
+void fastboot_nand_getvar_partition_size(const char *part_name, char *response)
+{
+	struct part_info *part_info;
+	size_t size;
+	int r;
+
+	r = fastboot_nand_get_part_info(part_name, &part_info, response);
+	if (r >= 0) {
+		size = part_info->size;
+		fastboot_response("OKAY", response, "0x%016zx", size);
+	}
+}
+
+U_BOOT_FASTBOOT_FLASH(nand) = {
+	.name = "nand",
+	.backend = FASTBOOT_FLASH_NAND,
+	.support_part = fastboot_nand_support_part,
+	.erase = fastboot_nand_erase,
+	.flash = fastboot_nand_flash_write,
+	.getvar_partition_size = fastboot_nand_getvar_partition_size,
+};

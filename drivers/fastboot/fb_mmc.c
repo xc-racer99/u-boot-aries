@@ -298,7 +298,7 @@ static int fb_mmc_update_zimage(struct blk_desc *dev_desc,
  * @part_info: Pointer to returned disk_partition_t
  * @response: Pointer to fastboot response buffer
  */
-int fastboot_mmc_get_part_info(char *part_name, struct blk_desc **dev_desc,
+int fastboot_mmc_get_part_info(const char *part_name, struct blk_desc **dev_desc,
 			       disk_partition_t *part_info, char *response)
 {
 	int r;
@@ -486,3 +486,45 @@ void fastboot_mmc_erase(const char *cmd, char *response)
 	       blks_size * info.blksz, cmd);
 	fastboot_okay(NULL, response);
 }
+
+bool fastboot_mmc_support_part(const char *part_name)
+{
+	struct blk_desc *dev_desc;
+	disk_partition_t part_info;
+	int r;
+
+	dev_desc = blk_get_dev("mmc", CONFIG_FASTBOOT_FLASH_MMC_DEV);
+	if (!dev_desc)
+		return false;
+
+	r = part_get_info_by_name_or_alias(dev_desc, part_name, &part_info);
+	if (r < 0)
+		return false;
+
+	return true;
+}
+
+void fastboot_mmc_getvar_partition_size(const char *part_name, char *response)
+{
+	struct blk_desc *dev_desc;
+	disk_partition_t part_info;
+	size_t size;
+	int r;
+
+	r = fastboot_mmc_get_part_info(part_name, &dev_desc, &part_info,
+				       response);
+
+	if (r >= 0) {
+		size = part_info.size;
+		fastboot_response("OKAY", response, "0x%016zx", size);
+	}
+}
+
+U_BOOT_FASTBOOT_FLASH(mmc) = {
+	.name = "mmc",
+	.backend = FASTBOOT_FLASH_MMC,
+	.support_part = fastboot_mmc_support_part,
+	.erase = fastboot_mmc_erase,
+	.flash = fastboot_mmc_flash_write,
+	.getvar_partition_size = fastboot_mmc_getvar_partition_size,
+};
