@@ -267,18 +267,15 @@ void fastboot_data_complete(char *response)
  */
 static void flash(char *cmd_parameter, char *response)
 {
-#if CONFIG_IS_ENABLED(FASTBOOT_FLASH_MMC)
-	fastboot_mmc_flash_write(cmd_parameter, fastboot_buf_addr, image_size,
-				 response);
-#endif
-#if CONFIG_IS_ENABLED(FASTBOOT_FLASH_NAND)
-	fastboot_nand_flash_write(cmd_parameter, fastboot_buf_addr, image_size,
-				  response);
-#endif
-#if CONFIG_IS_ENABLED(FASTBOOT_FLASH_ONENAND)
-	fastboot_onenand_flash_write(cmd_parameter, fastboot_buf_addr, image_size,
-				     response);
-#endif
+	struct fb_flash_driver *driver;
+
+	driver = fastboot_find_supported_flash_driver(cmd_parameter);
+
+	if (driver == NULL) {
+		fastboot_fail("No backend found", response);
+		return;
+	}
+	driver->flash(cmd_parameter, fastboot_buf_addr, image_size, response);
 }
 
 /**
@@ -292,15 +289,16 @@ static void flash(char *cmd_parameter, char *response)
  */
 static void erase(char *cmd_parameter, char *response)
 {
-#if CONFIG_IS_ENABLED(FASTBOOT_FLASH_MMC)
-	fastboot_mmc_erase(cmd_parameter, response);
-#endif
-#if CONFIG_IS_ENABLED(FASTBOOT_FLASH_NAND)
-	fastboot_nand_erase(cmd_parameter, response);
-#endif
-#if CONFIG_IS_ENABLED(FASTBOOT_FLASH_ONENAND)
-	fastboot_onenand_erase(cmd_parameter, response);
-#endif
+	struct fb_flash_driver *driver;
+
+	driver = fastboot_find_supported_flash_driver(cmd_parameter);
+
+	if (driver == NULL) {
+		fastboot_fail("No backend found", response);
+		return;
+	}
+
+	driver->erase(cmd_parameter, response);
 }
 #endif
 

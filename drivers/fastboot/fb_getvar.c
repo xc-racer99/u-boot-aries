@@ -160,34 +160,15 @@ static void getvar_partition_type(char *part_name, char *response)
 #if CONFIG_IS_ENABLED(FASTBOOT_FLASH)
 static void getvar_partition_size(char *part_name, char *response)
 {
-	int r;
-	size_t size;
+	struct fb_flash_driver *driver;
 
-#if CONFIG_IS_ENABLED(FASTBOOT_FLASH_MMC)
-	struct blk_desc *dev_desc;
-	disk_partition_t part_info;
+	driver = fastboot_find_supported_flash_driver(part_name);
 
-	r = fastboot_mmc_get_part_info(part_name, &dev_desc, &part_info,
-				       response);
-	if (r >= 0)
-		size = part_info.size;
-#endif
-#if CONFIG_IS_ENABLED(FASTBOOT_FLASH_NAND)
-	struct part_info *part_info;
-
-	r = fastboot_nand_get_part_info(part_name, &part_info, response);
-	if (r >= 0)
-		size = part_info->size;
-#endif
-#if CONFIG_IS_ENABLED(FASTBOOT_FLASH_ONENAND)
-	struct part_info *part_info;
-
-	r = fastboot_onenand_get_part_info(part_name, &part_info, response);
-	if (r >= 0)
-		size = part_info->size;
-#endif
-	if (r >= 0)
-		fastboot_response("OKAY", response, "0x%016zx", size);
+	if (driver == NULL) {
+		fastboot_fail("No backend found", response);
+	} else {
+		driver->getvar_partition_size(part_name, response);
+	}
 }
 #endif
 

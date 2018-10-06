@@ -102,7 +102,7 @@ static lbaint_t fb_onenand_sparse_reserve(struct sparse_storage *info,
  * @part_info: Pointer to returned part_info pointer
  * @response: Pointer to fastboot response buffer
  */
-int fastboot_onenand_get_part_info(char *part_name, struct part_info **part_info,
+int fastboot_onenand_get_part_info(const char *part_name, struct part_info **part_info,
 				char *response)
 {
 	struct mtd_info *mtd = NULL;
@@ -214,3 +214,46 @@ void fastboot_onenand_erase(const char *cmd, char *response)
 
 	fastboot_okay(NULL, response);
 }
+
+bool fastboot_onenand_support_part(const char *part_name)
+{
+	struct mtd_device *dev;
+	struct part_info *part_info;
+	int ret;
+	u8 pnum;
+
+	ret = mtdparts_init();
+	if (ret)
+		return false;
+
+	ret = find_dev_and_part(part_name, &dev, &pnum, &part_info);
+	if (ret)
+		return false;
+
+	if (dev->id->type != MTD_DEV_TYPE_ONENAND)
+		return false;
+
+	return true;
+}
+
+void fastboot_onenand_getvar_partition_size(const char *part_name, char *response)
+{
+	struct part_info *part_info;
+	size_t size;
+	int r;
+
+	r = fastboot_onenand_get_part_info(part_name, &part_info, response);
+	if (r >= 0) {
+		size = part_info->size;
+		fastboot_response("OKAY", response, "0x%016zx", size);
+	}
+}
+
+U_BOOT_FASTBOOT_FLASH(onenand) = {
+	.name = "onenand",
+	.backend = FASTBOOT_FLASH_ONENAND,
+	.support_part = fastboot_onenand_support_part,
+	.erase = fastboot_onenand_erase,
+	.flash = fastboot_onenand_flash_write,
+	.getvar_partition_size = fastboot_onenand_getvar_partition_size,
+};

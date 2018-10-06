@@ -41,6 +41,38 @@ enum {
 };
 
 /**
+ * All fastboot flash backends
+ */
+enum fb_flash_backend {
+	FASTBOOT_FLASH_MMC,
+	FASTBOOT_FLASH_NAND,
+	FASTBOOT_FLASH_ONENAND,
+};
+
+struct fb_flash_driver {
+	const char *name;
+	enum fb_flash_backend backend;
+
+	bool (*support_part)(const char *part_name);
+
+	void (*erase)(const char *cmd_parameter, char *response);
+
+	void (*flash)(const char *cmd_parameter, void *download_buffer, u32 size, char *response);
+
+	void (*getvar_partition_size)(const char *part_name, char *response);
+};
+
+/* Declare a new fastboot flash driver */
+#define U_BOOT_FASTBOOT_FLASH(__name)					\
+	ll_entry_declare(struct fb_flash_driver, __name, fb_flash_driver)
+
+/**
+ * fastboot_find_supported_flash_driver() - Finds supported flash driver
+ * @part_name: partition name that needs to be supported
+ */
+struct fb_flash_driver *fastboot_find_supported_flash_driver(char *part_name);
+
+/**
  * fastboot_response() - Writes a response of the form "$tag$reason".
  *
  * @tag: The first part of the response
