@@ -102,7 +102,7 @@ static int ubi_check_volumename(const struct ubi_volume *vol, const char *name)
 	return strcmp(vol->name, name);
 }
 
-static int ubi_check(const char *name)
+int ubi_check(const char *name)
 {
 	int i;
 
@@ -478,6 +478,31 @@ int ubi_detach(void)
 
 	ubi_dev.selected = 0;
 	return 0;
+}
+
+int is_ubi_initialized(void)
+{
+	return ubi_initialized;
+}
+
+struct ubi_volume *get_ubi_volume(const char *name)
+{
+	int i;
+
+	for (i = 0; i < (ubi->vtbl_slots + 1); i++) {
+		if (!ubi->volumes[i])
+			continue;	/* Empty record */
+
+		if (!ubi_check_volumename(ubi->volumes[i], name))
+			return ubi->volumes[i];
+	}
+
+	return NULL;
+}
+
+struct ubi_device *get_ubi_device(void)
+{
+	return ubi;
 }
 
 int ubi_part(char *part_name, const char *vid_header_offset)
