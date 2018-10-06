@@ -47,6 +47,7 @@ enum fb_flash_backend {
 	FASTBOOT_FLASH_MMC,
 	FASTBOOT_FLASH_NAND,
 	FASTBOOT_FLASH_ONENAND,
+	FASTBOOT_FLASH_UBI,
 };
 
 struct fb_flash_driver {
