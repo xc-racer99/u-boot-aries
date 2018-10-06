@@ -84,6 +84,10 @@ config FASTBOOT_FLASH_ONENAND
 	bool "FASTBOOT on ONENAND"
 	depends on CMD_ONENAND && CMD_MTDPARTS
 
+config FASTBOOT_FLASH_UBI
+	bool "FASTBOOT on UBI"
+	depends on MTD_UBI && CMD_UBI
+
 endif
 
 config FASTBOOT_FLASH_MMC_DEV
