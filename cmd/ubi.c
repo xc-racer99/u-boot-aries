@@ -97,12 +97,12 @@ static int ubi_info(int layout)
 	return 0;
 }
 
-static int ubi_check_volumename(const struct ubi_volume *vol, char *name)
+static int ubi_check_volumename(const struct ubi_volume *vol, const char *name)
 {
 	return strcmp(vol->name, name);
 }
 
-static int ubi_check(char *name)
+static int ubi_check(const char *name)
 {
 	int i;
 
@@ -162,7 +162,7 @@ bad:
 	return err;
 }
 
-static int ubi_create_vol(char *volume, int64_t size, int dynamic, int vol_id)
+static int ubi_create_vol(const char *volume, int64_t size, int dynamic, int vol_id)
 {
 	struct ubi_mkvol_req req;
 	int err;
@@ -192,7 +192,7 @@ static int ubi_create_vol(char *volume, int64_t size, int dynamic, int vol_id)
 	return ubi_create_volume(ubi, &req);
 }
 
-static struct ubi_volume *ubi_find_volume(char *volume)
+static struct ubi_volume *ubi_find_volume(const char *volume)
 {
 	struct ubi_volume *vol = NULL;
 	int i;
@@ -207,7 +207,7 @@ static struct ubi_volume *ubi_find_volume(char *volume)
 	return NULL;
 }
 
-static int ubi_remove_vol(char *volume)
+static int ubi_remove_vol(const char *volume)
 {
 	int err, reserved_pebs, i;
 	struct ubi_volume *vol;
@@ -261,7 +261,7 @@ out_err:
 	return err;
 }
 
-static int ubi_volume_continue_write(char *volume, void *buf, size_t size)
+static int ubi_volume_continue_write(const char *volume, void *buf, size_t size)
 {
 	int err = 1;
 	struct ubi_volume *vol;
@@ -296,7 +296,7 @@ static int ubi_volume_continue_write(char *volume, void *buf, size_t size)
 	return 0;
 }
 
-int ubi_volume_begin_write(char *volume, void *buf, size_t size,
+int ubi_volume_begin_write(const char *volume, void *buf, size_t size,
 	size_t full_size)
 {
 	int err = 1;
@@ -322,12 +322,12 @@ int ubi_volume_begin_write(char *volume, void *buf, size_t size,
 	return ubi_volume_continue_write(volume, buf, size);
 }
 
-int ubi_volume_write(char *volume, void *buf, size_t size)
+int ubi_volume_write(const char *volume, void *buf, size_t size)
 {
 	return ubi_volume_begin_write(volume, buf, size, size);
 }
 
-int ubi_volume_read(char *volume, char *buf, size_t size)
+int ubi_volume_read(const char *volume, char *buf, size_t size)
 {
 	int err, lnum, off, len, tbuf_size;
 	void *tbuf;
