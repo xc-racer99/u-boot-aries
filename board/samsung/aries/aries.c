@@ -146,23 +146,21 @@ int board_mmc_init(bd_t *bis)
 	gpio_cfg_pin(S5PC110_GPIO_H34, S5P_GPIO_INPUT);
 	gpio_set_pull(S5PC110_GPIO_H34, S5P_GPIO_PULL_UP);
 
-	if (!gpio_get_value(S5PC110_GPIO_H34)) {
-		for (i = S5PC110_GPIO_G20; i < S5PC110_GPIO_G27; i++) {
-			if (i == S5PC110_GPIO_G22)
-				continue;
+	for (i = S5PC110_GPIO_G20; i < S5PC110_GPIO_G27; i++) {
+		if (i == S5PC110_GPIO_G22)
+			continue;
 
-			/* GPG2[0:6] special function 2 */
-			gpio_cfg_pin(i, 0x2);
-			/* GPG2[0:6] pull disable */
-			gpio_set_pull(i, S5P_GPIO_PULL_NONE);
-			/* GPG2[0:6] drv 4x */
-			gpio_set_drv(i, S5P_GPIO_DRV_4X);
-		}
-
-		ret_sd = s5p_mmc_init(2, 4);
-		if (ret_sd)
-			pr_err("MMC: Failed to init SD card\n");
+		/* GPG2[0:6] special function 2 */
+		gpio_cfg_pin(i, 0x2);
+		/* GPG2[0:6] pull disable */
+		gpio_set_pull(i, S5P_GPIO_PULL_NONE);
+		/* GPG2[0:6] drv 4x */
+		gpio_set_drv(i, S5P_GPIO_DRV_4X);
 	}
+
+	ret_sd = s5p_mmc_init(2, 4);
+	if (ret_sd)
+		pr_err("MMC: Failed to init SD card\n");
 
 	/* Now register emmc for devices with it */
 	if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
