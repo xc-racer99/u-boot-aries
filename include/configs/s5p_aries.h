@@ -121,7 +121,19 @@
 		"bootm ${kernel_load_addr} - ${fdt_addr}\0"\
 	"bootmenu_1=OneNAND Main Boot=onenand read ${kernel_load_addr} 0x1980000 0xA00000; bootm ${kernel_load_addr}\0" \
 	"bootmenu_2=OneNAND Recovery Boot=onenand read ${kernel_load_addr} 0x2380000 0xA00000; bootm ${kernel_load_addr}\0" \
+	"bootmenu_3=Fastboot=ubi part ubi; fastboot usb 0; bootd;;\0" \
+	"bootmenu_4=Update U-Boot from SD Card Partition 1=run uboot_update; sleep 5; bootd;\0" \
+	"bootmenu_5=SD Card Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev ${sddev}; run mmcboot;\0" \
+	"bootmenu_6=SD Card Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev ${sddev}; run mmcboot;\0" \
+	"bootmenu_7=SD Card - Mass Storage=ums 0 mmc 0;\0" \
+	"bootmenu_8=MMC Partition 1 Boot=setenv mmcdev 1; setenv mmcpart 1; setenv rootdev 0; run mmcboot;\0" \
+	"bootmenu_9=MMC Partition 2 Boot=setenv mmcdev 1; setenv mmcpart 2; setenv rootdev 0; run mmcboot;\0" \
+	"bootmenu_10=MMC - Mass Storage=ums 0 mmc 1;\0" \
 	"boot_mode=normal\0"
+
+#define MMC_BOOTMENU1	"bootmenu_8"
+#define MMC_BOOTMENU2	"bootmenu_9"
+#define MMC_BOOTMENU3	"bootmenu_10"
 
 #define CONFIG_SYS_PBSIZE	384	/* Print Buffer Size */
 /* memtest works on */
