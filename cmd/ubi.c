@@ -261,7 +261,7 @@ out_err:
 	return err;
 }
 
-static int ubi_volume_continue_write(const char *volume, void *buf, size_t size)
+int ubi_volume_continue_write(const char *volume, const void *buf, size_t size)
 {
 	int err = 1;
 	struct ubi_volume *vol;
@@ -296,7 +296,7 @@ static int ubi_volume_continue_write(const char *volume, void *buf, size_t size)
 	return 0;
 }
 
-int ubi_volume_begin_write(const char *volume, void *buf, size_t size,
+int ubi_volume_begin_write(const char *volume, const void *buf, size_t size,
 	size_t full_size)
 {
 	int err = 1;
@@ -322,7 +322,7 @@ int ubi_volume_begin_write(const char *volume, void *buf, size_t size,
 	return ubi_volume_continue_write(volume, buf, size);
 }
 
-int ubi_volume_write(const char *volume, void *buf, size_t size)
+int ubi_volume_write(const char *volume, const void *buf, size_t size)
 {
 	return ubi_volume_begin_write(volume, buf, size, size);
 }

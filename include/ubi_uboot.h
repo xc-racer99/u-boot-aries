@@ -73,7 +73,10 @@ extern int ubi_mtd_param_parse(const char *val, struct kernel_param *kp);
 extern int ubi_init(void);
 extern void ubi_exit(void);
 extern int ubi_part(char *part_name, const char *vid_header_offset);
-extern int ubi_volume_write(const char *volume, void *buf, size_t size);
+extern int ubi_volume_write(const char *volume, const void *buf, size_t size);
+extern int ubi_volume_begin_write(const char *volume, const void *buf, size_t size,
+	size_t full_size);
+extern int ubi_volume_continue_write(const char *volume, const void *buf, size_t size);
 extern int ubi_volume_read(const char *volume, char *buf, size_t size);
 
 extern struct ubi_volume *get_ubi_volume(const char *name);
