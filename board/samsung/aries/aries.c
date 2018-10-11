@@ -146,23 +146,21 @@ int board_mmc_init(bd_t *bis)
 	gpio_cfg_pin(S5PC110_GPIO_H34, S5P_GPIO_INPUT);
 	gpio_set_pull(S5PC110_GPIO_H34, S5P_GPIO_PULL_UP);
 
-	if (!gpio_get_value(S5PC110_GPIO_H34)) {
-		for (i = S5PC110_GPIO_G20; i < S5PC110_GPIO_G27; i++) {
-			if (i == S5PC110_GPIO_G22)
-				continue;
+	for (i = S5PC110_GPIO_G20; i < S5PC110_GPIO_G27; i++) {
+		if (i == S5PC110_GPIO_G22)
+			continue;
 
-			/* GPG2[0:6] special function 2 */
-			gpio_cfg_pin(i, 0x2);
-			/* GPG2[0:6] pull disable */
-			gpio_set_pull(i, S5P_GPIO_PULL_NONE);
-			/* GPG2[0:6] drv 4x */
-			gpio_set_drv(i, S5P_GPIO_DRV_4X);
-		}
-
-		ret_sd = s5p_mmc_init(2, 4);
-		if (ret_sd)
-			pr_err("MMC: Failed to init SD card\n");
+		/* GPG2[0:6] special function 2 */
+		gpio_cfg_pin(i, 0x2);
+		/* GPG2[0:6] pull disable */
+		gpio_set_pull(i, S5P_GPIO_PULL_NONE);
+		/* GPG2[0:6] drv 4x */
+		gpio_set_drv(i, S5P_GPIO_DRV_4X);
 	}
+
+	ret_sd = s5p_mmc_init(2, 4);
+	if (ret_sd)
+		pr_err("MMC: Failed to init SD card\n");
 
 	/* Now register emmc for devices with it */
 	if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
@@ -304,7 +302,6 @@ int setup_bootmenu(void)
 {
 	int vol_up;
 	int vol_down;
-	static const char* uboot_cmd = "Update U-Boot from SD Card Partition 1=run uboot_update; sleep 5; bootd;";
 
 	switch (cur_board) {
 		case BOARD_FASCINATE4G:
@@ -330,23 +327,11 @@ int setup_bootmenu(void)
 	if (readl(S5PC110_INFORM5))
 		env_set("boot_mode", "charger");
 
-	/* Setup SD/MMC */
-	if (!gpio_get_value(S5PC110_GPIO_H34)) {
-		env_set("bootmenu_3", "SD Card Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev ${sddev}; run mmcboot;");
-		env_set("bootmenu_4", "SD Card Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev ${sddev}; run mmcboot;");
-		env_set("bootmenu_5", "SD Card - Mass Storage=ums 0 mmc 0;");
-		if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
-			env_set("bootmenu_6", "MMC Partition 1 Boot=setenv mmcdev 1; setenv mmcpart 1; setenv rootdev 0; run mmcboot;");
-			env_set("bootmenu_7", "MMC Partition 2 Boot=setenv mmcdev 1; setenv mmcpart 2; setenv rootdev 0; run mmcboot;");
-			env_set("bootmenu_8", "MMC - Mass Storage=ums 0 mmc 1;");
-			env_set("bootmenu_9", uboot_cmd);
-		} else {
-			env_set("bootmenu_6", uboot_cmd);
-		}
-	} else if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
-		env_set("bootmenu_3", "MMC Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev 0; run mmcboot;");
-		env_set("bootmenu_4", "MMC Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev 0; run mmcboot;");
-		env_set("bootmenu_5", "MMC - Mass Storage=ums 0 mmc 0;");
+	/* Those don't have mmc, so remove mmc bootmenu entries related to it */
+	if (cur_board == BOARD_FASCINATE4G || cur_board == BOARD_GALAXYS4G) {
+		env_set(MMC_BOOTMENU1, NULL);
+		env_set(MMC_BOOTMENU2, NULL);
+		env_set(MMC_BOOTMENU3, NULL);
 	}
 
 	/* Choose default bootmenu */
