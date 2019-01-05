@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Samsung's S5PC110-based first generation Galaxy S common board device tree source
+ *
+ * Copyright (c) 2014 Google, Inc
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/input/linux-event-codes.h>
+#include "s5pc1xx-aries.dts"
+
+/ {
+	model = "Samsung Wave 2 based on S5PC110";
+	compatible = "samsung,wave2", "samsung,s5pc110";
+};

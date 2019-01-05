@@ -8,6 +8,7 @@
 
 #define GPD1_BASE 0x0C0
 #define GPJ0_BASE 0x240
+#define GPJ3_BASE 0x2A0
 #define MP04_BASE 0x340
 
 enum board cur_board = BOARD_MAX;
@@ -21,6 +22,7 @@ static const char *board_fit_name[BOARD_MAX] = {
 	[BOARD_GALAXYS4G] = "s5pc1xx-fascinate4g",
 	[BOARD_GALAXYSB] = "s5pc1xx-aries",
 	[BOARD_VIBRANT] = "s5pc1xx-aries",
+	[BOARD_WAVE2] = "s5pc1xx-wave2",
 };
 
 /**
@@ -81,6 +83,22 @@ static bool is_galaxys(void)
 	return get_value(S5PC110_GPIO_BASE + GPD1_BASE, 2);
 }
 
+static bool is_wave2(void)
+{
+	/**
+	 * On wave/wave2:
+	 * It don't have touchkey hw, which is normally connected to i2c.
+	 * GPJ3(0) and GPJ3(1) - emulated I2C bus with external pull-up.
+	 * When internally pulled down, value should stay high.
+	 * Everything else:
+	 * No external pull-up.  Goes low when interally pulled down.
+	 */
+	gpio_cfg_pin(S5PC110_GPIO_J30, S5P_GPIO_INPUT);
+	gpio_set_pull(S5PC110_GPIO_J30, S5P_GPIO_PULL_DOWN);
+
+	return !get_value(S5PC110_GPIO_BASE + GPJ3_BASE, 0);
+}
+
 static bool is_galaxys4g(void)
 {
 	/**
@@ -115,6 +133,9 @@ static bool is_captivate(void)
 
 enum board guess_board(void)
 {
+	if (is_wave2()) {
+		return BOARD_WAVE2;
+	}
 	if (is_galaxys()) {
 		if (get_hwrev() == 0xf)
 			return BOARD_GALAXYSB;

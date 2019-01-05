@@ -36,7 +36,7 @@ CONFIG_CMD_MTDPARTS=y
 CONFIG_MTDIDS_DEFAULT="onenand0=b0600000.onenand"
 CONFIG_CMD_UBI=y
 CONFIG_DEFAULT_DEVICE_TREE="s5pc1xx-aries"
-CONFIG_OF_LIST="s5pc1xx-aries s5pc1xx-fascinate4g s5pc1xx-galaxys"
+CONFIG_OF_LIST="s5pc1xx-aries s5pc1xx-fascinate4g s5pc1xx-galaxys s5pc1xx-wave2"
 CONFIG_MULTI_DTB_FIT=y
 CONFIG_ENV_IS_IN_ONENAND=y
 CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y

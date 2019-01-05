@@ -34,6 +34,7 @@ static const char *board_linux_fdt_name[BOARD_MAX] = {
 	[BOARD_GALAXYS4G] = "s5pv210-fascinate4g.dtb",
 	[BOARD_GALAXYSB] = "s5pv210-aries.dtb",
 	[BOARD_VIBRANT] = "s5pv210-aries.dtb",
+	[BOARD_WAVE2] = "s5pv210-wave2.dtb",
 };
 
 u32 get_board_rev(void)
@@ -298,10 +299,15 @@ int set_default_bootmenu(const char *def)
 	return 0;
 }
 
+int has_gpio_keys(void)
+{
+	return (cur_board != BOARD_WAVE2);
+}
+
 int setup_bootmenu(void)
 {
-	int vol_up;
-	int vol_down;
+	int vol_up = -1;
+	int vol_down = -1;
 
 	switch (cur_board) {
 		case BOARD_FASCINATE4G:
@@ -314,14 +320,19 @@ int setup_bootmenu(void)
 			vol_up = S5PC110_GPIO_H33;
 			vol_down = S5PC110_GPIO_H31;
 			break;
+		case BOARD_WAVE2:
+			// no key support yet
+			break;
 		default:
 			vol_up = S5PC110_GPIO_H32;
 			vol_down = S5PC110_GPIO_H31;
 			break;
 	}
 
-	gpio_request(vol_up, "volume_up");
-	gpio_request(vol_down, "volume_down");
+	if (vol_up > -1)
+		gpio_request(vol_up, "volume_up");
+	if (vol_down > -1)
+		gpio_request(vol_down, "volume_down");
 
 	/* Check if powering on due to charger */
 	if (readl(S5PC110_INFORM5))
@@ -335,12 +346,12 @@ int setup_bootmenu(void)
 	}
 
 	/* Choose default bootmenu */
-	if (readl(S5PC110_INFORM6) || !gpio_get_value(vol_down)) {
+	if (readl(S5PC110_INFORM6) || (has_gpio_keys() && !gpio_get_value(vol_down))) {
 		/* Recovery mode */
 		env_set("boot_mode", "recovery");
 
 		return set_default_bootmenu(env_get("bootmenu_2"));
-	} else if (!gpio_get_value(vol_up)) {
+	} else if (has_gpio_keys() && !gpio_get_value(vol_up)) {
 		/* SD part 1 boot, or MMC part 1 if no SD */
 		return set_default_bootmenu(env_get("bootmenu_3"));
 	}
