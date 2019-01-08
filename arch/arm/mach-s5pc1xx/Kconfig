@@ -8,6 +8,7 @@ config TARGET_S5P_ARIES
 	bool "S5P Aries board"
 	select OF_CONTROL
 	select BOARD_LATE_INIT
+	select SUPPORT_SPL
 
 config TARGET_S5P_GONI
 	bool "S5P Goni board"
