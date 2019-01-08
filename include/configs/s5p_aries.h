@@ -29,6 +29,9 @@
 /* DRAM Base */
 #define CONFIG_SYS_SDRAM_BASE		0x30000000
 
+/* SPL Settings */
+#define CONFIG_SPL_TEXT_BASE		0xD0022010
+
 /* Max u-boot.bin size - 3 256K OneNAND pages */
 #define CONFIG_BOARD_SIZE_LIMIT		0xC0000
 

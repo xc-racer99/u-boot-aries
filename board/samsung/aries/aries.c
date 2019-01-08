@@ -14,6 +14,7 @@
 #include <asm/arch/cpu.h>
 #include <power/max8998_pmic.h>
 #include <samsung/misc.h>
+#include <spl.h>
 #include <mmc.h>
 #include <usb.h>
 #include <usb_mass_storage.h>
@@ -35,6 +36,22 @@ static const char *board_linux_fdt_name[BOARD_MAX] = {
 	[BOARD_GALAXYSB] = "s5pv210-aries.dtb",
 	[BOARD_VIBRANT] = "s5pv210-aries.dtb",
 };
+
+#ifdef CONFIG_SPL_BUILD
+inline void hang(void)
+{
+	while(true)
+		;
+}
+
+// TODO - Should this be something?
+inline int timer_init(void) { return 0; }
+
+u32 spl_boot_device(void)
+{
+	return BOOT_DEVICE_ONENAND;
+}
+#endif
 
 u32 get_board_rev(void)
 {
