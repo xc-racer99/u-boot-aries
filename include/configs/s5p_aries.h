@@ -115,25 +115,36 @@
 	"mmcdev=0\0" \
 	"mmcpart=1\0" \
 	"mmcboot="\
+		"if test ${default_boot_mode} != mmc ; then " \
+			"setenv default_boot_mode mmc;" \
+			"saveenv;" \
+		"fi;" \
 		"run check_dtb;" \
 		"run loadkernel;" \
 		"run setup_kernel_args;" \
 		"bootm ${kernel_load_addr} - ${fdt_addr}\0"\
-	"bootmenu_1=OneNAND Main Boot=onenand read ${kernel_load_addr} 0x1980000 0xA00000; bootm ${kernel_load_addr}\0" \
-	"bootmenu_2=OneNAND Recovery Boot=onenand read ${kernel_load_addr} 0x2380000 0xA00000; bootm ${kernel_load_addr}\0" \
-	"bootmenu_3=Fastboot=ubi part ubi; fastboot usb 0; bootd;;\0" \
-	"bootmenu_4=Update U-Boot from SD Card Partition 1=run uboot_update; sleep 5; bootd;\0" \
-	"bootmenu_5=SD Card Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev ${sddev}; run mmcboot;\0" \
-	"bootmenu_6=SD Card Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev ${sddev}; run mmcboot;\0" \
-	"bootmenu_7=SD Card - Mass Storage=ums 0 mmc 0;\0" \
-	"bootmenu_8=MMC Partition 1 Boot=setenv mmcdev 1; setenv mmcpart 1; setenv rootdev 0; run mmcboot;\0" \
-	"bootmenu_9=MMC Partition 2 Boot=setenv mmcdev 1; setenv mmcpart 2; setenv rootdev 0; run mmcboot;\0" \
-	"bootmenu_10=MMC - Mass Storage=ums 0 mmc 1;\0" \
-	"boot_mode=normal\0"
+	"onenand_boot=" \
+		"if test ${default_boot_mode} != onenand ; then " \
+			"setenv default_boot_mode onenand;" \
+			"saveenv;" \
+		"fi;" \
+		"setenv bootargs ${mtdparts} ubi.mtd=ubi androidboot.mode=${boot_mode} androidboot.serialno=${serial#};" \
+		"onenand read ${kernel_load_addr} ${onenand_load_offset} 0xA00000;" \
+		"bootm ${kernel_load_addr};\0" \
+	"bootmenu_0=Fastboot=ubi part ubi; fastboot usb 0; bootd;\0" \
+	"bootmenu_1=Update U-Boot from SD Card Partition 1=run uboot_update; sleep 5; bootd;\0" \
+	"bootmenu_2=OneNAND Main Boot=setenv boot_mode normal; setenv onenand_load_offset 0x1980000; run onenand_boot;\0" \
+	"bootmenu_3=OneNAND Recovery Boot=setenv boot_mode recovery; setenv onenand_load_offset 0x2380000; run onenand_boot;\0" \
+	"bootmenu_4=SD Card Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev ${sddev}; run mmcboot;\0" \
+	"bootmenu_5=SD Card Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev ${sddev}; run mmcboot;\0" \
+	"bootmenu_6=SD Card - Mass Storage=ums 0 mmc 0;\0" \
+	"bootmenu_7=MMC Partition 1 Boot=setenv mmcdev 1; setenv mmcpart 1; setenv rootdev 0; run mmcboot;\0" \
+	"bootmenu_8=MMC Partition 2 Boot=setenv mmcdev 1; setenv mmcpart 2; setenv rootdev 0; run mmcboot;\0" \
+	"bootmenu_9=MMC - Mass Storage=ums 0 mmc 1;\0"
 
-#define MMC_BOOTMENU1	"bootmenu_8"
-#define MMC_BOOTMENU2	"bootmenu_9"
-#define MMC_BOOTMENU3	"bootmenu_10"
+#define MMC_BOOTMENU1	"bootmenu_7"
+#define MMC_BOOTMENU2	"bootmenu_8"
+#define MMC_BOOTMENU3	"bootmenu_9"
 
 #define CONFIG_SYS_PBSIZE	384	/* Print Buffer Size */
 /* memtest works on */

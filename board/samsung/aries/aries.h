@@ -10,4 +10,10 @@ enum board {
 	BOARD_MAX,
 };
 
+enum {
+	KEY_VOLUME_UP = 0x1,
+	KEY_VOLUME_DOWN = 0x2,
+	KEY_HOME = 0x4,
+};
+
 extern enum board cur_board;

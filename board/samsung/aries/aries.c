@@ -259,21 +259,44 @@ int board_usb_init(int index, enum usb_init_type init)
 }
 #endif
 
+/* Keymask for different bootmodes */
+int bootmenu_keymask;
+int recovery_keymask;
+
 #ifdef CONFIG_MISC_INIT_R
 int misc_init_r(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	set_board_info();
 	env_set("fdtfile", board_linux_fdt_name[cur_board]);
-	switch(cur_board) {
+
+	/* Storage setup - larger OneNAND and no MMC */
+	switch (cur_board) {
 		case BOARD_FASCINATE4G:
 		case BOARD_GALAXYS4G:
+			/* Hide MMC entries */
+			env_set(MMC_BOOTMENU1, NULL);
+			env_set(MMC_BOOTMENU2, NULL);
+			env_set(MMC_BOOTMENU3, NULL);
 			env_set("sddev", "1");
 			env_set("mtdparts", "mtdparts=b0600000.onenand:256k@25856k(uboot-env),10240k(boot),10240k(recovery),980480k(ubi)");
 			break;
 		default:
 			env_set("sddev", "2");
 			env_set("mtdparts", "mtdparts=b0600000.onenand:256k@25856k(uboot-env),10240k(boot),10240k(recovery),466432k(ubi)");
+			break;
+	}
+
+	/* Keymasks for boot modes as some variants have home buttons */
+	switch (cur_board) {
+		case BOARD_GALAXYS:
+		case BOARD_GALAXYSB:
+			bootmenu_keymask = KEY_HOME;
+			recovery_keymask = KEY_VOLUME_UP;
+			break;
+		default:
+			bootmenu_keymask = KEY_VOLUME_UP;
+			recovery_keymask = KEY_VOLUME_DOWN;
 			break;
 	}
 #endif
@@ -286,22 +309,26 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 	return 0;
 }
 
-int set_default_bootmenu(const char *def)
+void setup_onenand_boot(int pressed)
 {
-	size_t len = 11 + strlen(def);
-	char *buf = malloc(len);
-	if (!buf)
-		return -ENOMEM;
-	snprintf(buf, len, "%s%s", "Default - ", def);
-	env_set("bootmenu_0", buf);
-	free(buf);
-	return 0;
+	if (readl(S5PC110_INFORM5)) {
+		env_set("boot_mode", "charger");
+		env_set("onenand_load_offset", "0x1980000");
+	} else if (pressed == recovery_keymask || readl(S5PC110_INFORM6)) {
+		env_set("boot_mode", "recovery");
+		env_set("onenand_load_offset", "0x2380000");
+	} else {
+		env_set("boot_mode", "normal");
+		env_set("onenand_load_offset", "0x1980000");
+	}
+	env_set("bootcmd", "run onenand_boot;");
 }
 
-int setup_bootmenu(void)
+int setup_bootcmd(void)
 {
-	int vol_up;
-	int vol_down;
+	int vol_up, vol_down;
+	int home = -1;
+	int pressed = 0;
 
 	switch (cur_board) {
 		case BOARD_FASCINATE4G:
@@ -317,36 +344,36 @@ int setup_bootmenu(void)
 		default:
 			vol_up = S5PC110_GPIO_H32;
 			vol_down = S5PC110_GPIO_H31;
+			home = S5PC110_GPIO_H35;
 			break;
 	}
 
 	gpio_request(vol_up, "volume_up");
 	gpio_request(vol_down, "volume_down");
 
-	/* Check if powering on due to charger */
-	if (readl(S5PC110_INFORM5))
-		env_set("boot_mode", "charger");
+	if (home > 0)
+		gpio_request(home, "home");
 
-	/* Those don't have mmc, so remove mmc bootmenu entries related to it */
-	if (cur_board == BOARD_FASCINATE4G || cur_board == BOARD_GALAXYS4G) {
-		env_set(MMC_BOOTMENU1, NULL);
-		env_set(MMC_BOOTMENU2, NULL);
-		env_set(MMC_BOOTMENU3, NULL);
+	if (gpio_get_value(vol_up) == 0)
+		pressed |= KEY_VOLUME_UP;
+
+	if (gpio_get_value(vol_down) == 0)
+		pressed |= KEY_VOLUME_DOWN;
+
+	if (home > 0 && gpio_get_value(home) == 0)
+		pressed |= KEY_HOME;
+
+	if (pressed == bootmenu_keymask) {
+		env_set("bootcmd", "sleep 1; bootmenu 20;");
+		return 0;
 	}
 
-	/* Choose default bootmenu */
-	if (readl(S5PC110_INFORM6) || !gpio_get_value(vol_down)) {
-		/* Recovery mode */
-		env_set("boot_mode", "recovery");
+	if (strcmp(env_get("default_boot_mode"), "mmc") == 0)
+		env_set("bootcmd", "run mmcboot;");
+	else
+		setup_onenand_boot(pressed);
 
-		return set_default_bootmenu(env_get("bootmenu_2"));
-	} else if (!gpio_get_value(vol_up)) {
-		/* SD part 1 boot, or MMC part 1 if no SD */
-		return set_default_bootmenu(env_get("bootmenu_3"));
-	}
-
-	/* Default OneNAND boot */
-	return set_default_bootmenu(env_get("bootmenu_1"));
+	return 0;
 }
 
 int board_late_init(void)
@@ -370,5 +397,5 @@ int board_late_init(void)
 		env_set("serial#", board_serial_str);
 	}
 
-	return setup_bootmenu();
+	return setup_bootcmd();
 }
