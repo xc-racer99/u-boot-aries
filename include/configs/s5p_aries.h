@@ -115,10 +115,6 @@
 	"mmcdev=0\0" \
 	"mmcpart=1\0" \
 	"mmcboot="\
-		"if test ${default_boot_mode} != mmc ; then " \
-			"setenv default_boot_mode mmc;" \
-			"saveenv;" \
-		"fi;" \
 		"run check_dtb;" \
 		"run loadkernel;" \
 		"run setup_kernel_args;" \
@@ -135,11 +131,15 @@
 	"bootmenu_1=Update U-Boot from SD Card Partition 1=run uboot_update; sleep 5; bootd;\0" \
 	"bootmenu_2=OneNAND Main Boot=setenv boot_mode normal; setenv onenand_load_offset 0x1980000; run onenand_boot;\0" \
 	"bootmenu_3=OneNAND Recovery Boot=setenv boot_mode recovery; setenv onenand_load_offset 0x2380000; run onenand_boot;\0" \
-	"bootmenu_4=SD Card Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev ${sddev}; run mmcboot;\0" \
-	"bootmenu_5=SD Card Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev ${sddev}; run mmcboot;\0" \
+	"bootmenu_4=SD Card Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev ${sddev};" \
+			"setenv default_boot_mode mmc; saveenv; run mmcboot;\0" \
+	"bootmenu_5=SD Card Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev ${sddev};" \
+			"setenv default_boot_mode mmc; saveenv; run mmcboot;\0" \
 	"bootmenu_6=SD Card - Mass Storage=ums 0 mmc 0;\0" \
-	"bootmenu_7=MMC Partition 1 Boot=setenv mmcdev 1; setenv mmcpart 1; setenv rootdev 0; run mmcboot;\0" \
-	"bootmenu_8=MMC Partition 2 Boot=setenv mmcdev 1; setenv mmcpart 2; setenv rootdev 0; run mmcboot;\0" \
+	"bootmenu_7=MMC Partition 1 Boot=setenv mmcdev 1; setenv mmcpart 1; setenv rootdev 0;" \
+			"setenv default_boot_mode mmc; saveenv; run mmcboot;\0" \
+	"bootmenu_8=MMC Partition 2 Boot=setenv mmcdev 1; setenv mmcpart 2; setenv rootdev 0;" \
+			"setenv default_boot_mode mmc; saveenv; run mmcboot;\0" \
 	"bootmenu_9=MMC - Mass Storage=ums 0 mmc 1;\0"
 
 #define MMC_BOOTMENU1	"bootmenu_7"
