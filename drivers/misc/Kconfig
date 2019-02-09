@@ -104,6 +104,12 @@ config DS4510
 	  and a configurable timer for the supervisor function. The device is
 	  connected over I2C.
 
+config FSA9480_USB_SWITCH
+	bool "Enable support for Fairchild FSA9480 USB switch"
+	help
+	  FSA9480 is a USB accessory switch supporting automatic detection
+	  of peripherals and is controlled via i2c
+
 config FSL_SEC_MON
 	bool "Enable FSL SEC_MON Driver"
 	help
