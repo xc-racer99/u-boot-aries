@@ -32,6 +32,20 @@
 		id = <2>;
 	};
 
+	i2c_musb: i2c-musb {
+		compatible = "i2c-gpio";
+		gpios = <&gpj3 4 0>, /* sda */
+			<&gpj3 5 0>; /* scl */
+		i2c-gpio,delay-us = <2>;        /* ~100 kHz */
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		fsa9480@25 {
+			compatible = "fcs,fsa9480";
+			reg = <0x25 0 0>;
+		};
+	};
+
 	i2c_pmic: i2c-pmic {
 		compatible = "i2c-gpio";
 		gpios = <&gpj4 0 0>, /* sda */

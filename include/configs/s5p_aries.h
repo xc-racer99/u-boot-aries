@@ -68,7 +68,7 @@
 #define CONFIG_G_DNL_UMS_VENDOR_NUM 0x0525
 #define CONFIG_G_DNL_UMS_PRODUCT_NUM 0xA4A5
 
-#define CONFIG_DEFAULT_CONSOLE	"ttySAC2,115200n8"
+#define CONFIG_DEFAULT_CONSOLE	"console=ttySAC2,115200n8"
 
 #define CONFIG_MISC_COMMON
 
@@ -83,7 +83,7 @@
 	"uboot_onenand_off=0x1200000\0" \
 	"uboot_onenand_size="__stringify(CONFIG_BOARD_SIZE_LIMIT)"\0" \
 	"meminfo=mem=80M mem=256M@0x40000000 mem=128M@0x50000000\0" \
-	"stdin=serial,gpio-keys\0" \
+	"stdin=serial,gpio-keys,fsa9480\0" \
 	"stdout=serial,vidconsole\0" \
 	"stderr=serial,vidconsole\0" \
 	"opts=ignore_loglevel earlyprintk\0" \
@@ -101,7 +101,7 @@
 		"|| load mmc ${mmcdev}:${mmcpart} ${fdt_load_addr} /boot/${fdtfile};\0" \
 	"setup_kernel_args=" \
 		"setenv bootargs root=/dev/mmcblk${rootdev}p${mmcpart}" \
-		" rootwait rw ${console} ${meminfo} ${opts} ${mtdparts} ubi.mtd=ubi;\0" \
+		" rootwait rw ${console} ${meminfo} ${opts} ${mtdparts} ubi.mtd=ubi no_console_suspend initcall_debug;\0" \
 	"sddev=1\0" \
 	"rootdev=1\0" \
 	"uboot_update=if test -e mmc 0:1 u-boot.bin; then "\
