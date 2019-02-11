@@ -277,7 +277,6 @@ int misc_init_r(void)
 			/* Hide MMC entries */
 			env_set(MMC_BOOTMENU1, NULL);
 			env_set(MMC_BOOTMENU2, NULL);
-			env_set(MMC_BOOTMENU3, NULL);
 			env_set("sddev", "1");
 			env_set("mtdparts", "mtdparts=b0600000.onenand:256k@25856k(uboot-env),10240k(boot),10240k(recovery),980480k(ubi)");
 			break;
@@ -368,8 +367,10 @@ int setup_bootcmd(void)
 		return 0;
 	}
 
-	if (strcmp(env_get("default_boot_mode"), "mmc") == 0)
-		env_set("bootcmd", "run mmcboot;");
+	if (strcmp(env_get("default_boot_mode"), "mmc0") == 0)
+		env_set("bootcmd", "run bootcmd_mmc0;");
+	else if (strcmp(env_get("default_boot_mode"), "mmc1") == 0)
+		env_set("bootcmd", "run bootcmd_mmc1;");
 	else
 		setup_onenand_boot(pressed);
 
