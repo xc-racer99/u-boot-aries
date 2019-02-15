@@ -31,6 +31,7 @@
 
 /* SPL Settings */
 #define CONFIG_SPL_TEXT_BASE		0xD0022010
+#define CONFIG_SPL_MAX_FOOTPRINT	0x18000 /* 96k */
 
 /* Max u-boot.bin size - 3 256K OneNAND pages */
 #define CONFIG_BOARD_SIZE_LIMIT		0xC0000
