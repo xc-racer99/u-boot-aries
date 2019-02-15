@@ -38,7 +38,6 @@ lowlevel_init:
 	beq	100f
 	ldr	r8, =S5PC110_GPIO_BASE
 100:
-	/* Turn on KEY_LED_ON [GPJ4(1)] XMSMWEN */
 	cmp	r7, r8
 	beq	skip_check_didle			@ Support C110 only
 
@@ -50,20 +49,6 @@ lowlevel_init:
 	cmp	r7, r8
 
 skip_check_didle:
-	addeq	r0, r8, #0x280				@ S5PC100_GPIO_J4
-	addne	r0, r8, #0x2C0				@ S5PC110_GPIO_J4
-	ldr	r1, [r0, #0x0]				@ GPIO_CON_OFFSET
-	bic	r1, r1, #(0xf << 4)			@ 1 * 4-bit
-	orr	r1, r1, #(0x1 << 4)
-	str	r1, [r0, #0x0]				@ GPIO_CON_OFFSET
-
-	ldr	r1, [r0, #0x4]				@ GPIO_DAT_OFFSET
-#ifdef CONFIG_SPL_BUILD
-	orr	r1, r1, #(1 << 1)			@ 1 * 1-bit
-#else
-	bic	r1, r1, #(1 << 1)
-#endif
-	str	r1, [r0, #0x4]				@ GPIO_DAT_OFFSET
 
 	/* Don't setup at s5pc100 */
 	beq	100f
