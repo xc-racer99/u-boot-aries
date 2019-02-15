@@ -38,15 +38,6 @@ static const char *board_linux_fdt_name[BOARD_MAX] = {
 };
 
 #ifdef CONFIG_SPL_BUILD
-inline void hang(void)
-{
-	while(true)
-		;
-}
-
-// TODO - Should this be something?
-inline int timer_init(void) { return 0; }
-
 u32 spl_boot_device(void)
 {
 	return BOOT_DEVICE_ONENAND;
