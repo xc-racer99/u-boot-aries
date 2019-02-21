@@ -2,6 +2,8 @@
 #include <config.h>
 #include <onenand_uboot.h>
 
+#include <mach/power.h>
+
 DECLARE_GLOBAL_DATA_PTR;
 
 void memzero(void *s, size_t n)
@@ -29,17 +31,32 @@ static void setup_global_data(gd_t *gdp)
 	gd->have_console = 1;
 }
 
-extern void do_hibl(void);
+extern void do_ibl(void);
+
+void (*start_usb_boot)(void) = (void *) 0xD0007D78;
+void (*init_system)(void) = (void *) 0xD0007CAC;
 
 void board_init_f(unsigned long bootflag)
 {
+	unsigned int reg;
 	__aligned(8) gd_t local_gd;
 	__attribute__((noreturn)) void (*uboot)(void);
 
 	setup_global_data(&local_gd);
 
+	reg = readl(S5PC110_PS_HOLD_CTRL);
+	reg |= 0x301;
+	writel(reg, S5PC110_PS_HOLD_CTRL);
+
 #if 1
-	do_hibl();
+	do_ibl();
+
+	init_system();
+
+	memcpy((void *)0xD0035400, (void *)0xD000C90C, 0x70);
+
+	start_usb_boot();
+	uboot = (void *)readl(0xD00354D0);
 #else
 #if 0
 	if (do_lowlevel_init())
@@ -53,9 +70,9 @@ void board_init_f(unsigned long bootflag)
 
 	/* Jump to U-Boot image */
 	uboot = (void *)CONFIG_SYS_TEXT_BASE;
+#endif
 	(*uboot)();
 	/* Never returns Here */
-#endif
 }
 
 /* Place Holders */
