@@ -19,6 +19,7 @@
 #include <asm/arch/cpu.h>		/* get chip and board defs */
 
 #define CONFIG_ARCH_CPU_INIT
+#define CONFIG_SKIP_LOWLEVEL_INIT_ONLY
 
 /* Disable L2 cache - enabling causes slowdowns of ~50% in Linux */
 #define CONFIG_SYS_L2CACHE_OFF
@@ -31,7 +32,8 @@
 
 /* SPL Settings */
 #define CONFIG_SPL_TEXT_BASE		0xD0022010
-#define CONFIG_SPL_MAX_FOOTPRINT	0x18000 /* 96k */
+#define CONFIG_SPL_MAX_FOOTPRINT	((14 << 10) - 4)
+#define CONFIG_SPL_STACK		0xD0036000
 
 /* Max u-boot.bin size - 3 256K OneNAND pages */
 #define CONFIG_BOARD_SIZE_LIMIT		0xC0000
