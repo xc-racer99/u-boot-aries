@@ -20,8 +20,8 @@
  * r9 has Mobile DDR size, 1 means 1GiB, 2 means 2GiB and so on
  */
 
-	.globl lowlevel_init
-lowlevel_init:
+	.globl do_hibl
+do_hibl:
 	ldr	r8, =0xE0200000
 
 	bl	ps_hold_reg
