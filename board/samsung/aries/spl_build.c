@@ -51,12 +51,17 @@ void board_init_f(unsigned long bootflag)
 #if 1
 	do_ibl();
 
+	onenand_spl_load_image(0xa80000,
+			0x140000, (void *) 0x40244000);
+
+#if 0
 	init_system();
 
 	memcpy((void *)0xD0035400, (void *)0xD000C90C, 0x70);
 
 	start_usb_boot();
 	uboot = (void *)readl(0xD00354D0);
+#endif
 #else
 #if 0
 	if (do_lowlevel_init())
@@ -68,9 +73,10 @@ void board_init_f(unsigned long bootflag)
 			CONFIG_BOARD_SIZE_LIMIT, (void *) CONFIG_SYS_TEXT_BASE);
 #endif
 
-	/* Jump to U-Boot image */
-	uboot = (void *)CONFIG_SYS_TEXT_BASE;
 #endif
+	/* Jump to U-Boot image */
+	uboot = (void *)0x40244000;
+
 	(*uboot)();
 	/* Never returns Here */
 }
