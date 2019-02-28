@@ -448,6 +448,12 @@ config LOGICORE_DP_TX
 	  Note that this is a pure transmitter device, and has no display
 	  capabilities by itself.
 
+config SAMSUNG_S6E63M0
+	bool "Enable Samsung s6e63mo panel"
+	depends on DM_VIDEO && DM_SPI
+	help
+	   SPI controlled Samsung s6e63m0 LCD panel.
+
 config VIDEO_BROADWELL_IGD
 	bool "Enable Intel Broadwell integrated graphics device"
 	depends on X86
