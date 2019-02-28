@@ -79,6 +79,38 @@ int board_init(void)
 	return 0;
 }
 
+int exynos_power_init(void)
+{
+	int val, ret, reg;
+	struct udevice *dev;
+
+	ret = pmic_get("max8998-pmic", &dev);
+	if (ret) {
+		pr_err("Failed to get max8998-pmic");
+		return ret;
+	}
+
+	/* LDO7 1.8V */
+	val = 0x02; /* (1800 - 1600) / 100; */
+	ret |= pmic_reg_write(dev,  MAX8998_REG_LDO7, val);
+
+	/* LDO17 3.0V */
+	val = 0xe; /* (3000 - 1600) / 100; */
+	ret |= pmic_reg_write(dev,  MAX8998_REG_LDO17, val);
+
+	reg = pmic_reg_read(dev, MAX8998_REG_ONOFF1);
+	reg |= MAX8998_LDO7 | MAX8998_LDO17;
+	ret |= pmic_reg_write(dev, MAX8998_REG_ONOFF1, reg);
+
+
+	if (ret) {
+		pr_err("MAX8998 LDO setting error!\n");
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
 #ifdef CONFIG_SYS_I2C_INIT_BOARD
 void i2c_init_board(void)
 {
