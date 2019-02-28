@@ -18,6 +18,8 @@ unsigned long get_pll_clk(int pllreg);
 unsigned long get_arm_clk(void);
 unsigned long get_pwm_clk(void);
 unsigned long get_uart_clk(int dev_index);
+unsigned long get_lcd_clk(void);
+void set_lcd_clk(void);
 void set_mmc_clk(int dev_index, unsigned int div);
 
 #endif

@@ -171,6 +171,45 @@ static unsigned long s5pc100_get_arm_clk(void)
 	return armclk;
 }
 
+/* s5pc110: return LCD clock frequency */
+static unsigned long s5pc110_get_lcd_clk(void)
+{
+	struct s5pc110_clock *clk =
+		(struct s5pc110_clock *)samsung_get_base_clock();
+	unsigned long pclk, sclk;
+	unsigned int sel;
+	unsigned int ratio;
+
+	/*
+	 * CLK_SRC1
+	 * MOUT_FIMD [20:23]
+	 */
+	sel = readl(&clk->src1);
+	sel = sel >> 20;
+	sel = sel & 0xf;
+
+	if (sel == 0x6)
+		sclk = get_pll_clk(MPLL);
+	else if (sel == 0x7)
+		sclk = get_pll_clk(EPLL);
+	else if (sel == 0x8)
+		sclk = get_pll_clk(VPLL);
+	else
+		return 0;
+
+	/*
+	 * CLK_DIV1
+	 * DOUT_FIMD [20:23]
+	 */
+	ratio = readl(&clk->div1);
+	ratio = ratio >> 20;
+	ratio = ratio & 0xf;
+
+	pclk = sclk / (ratio + 1);
+
+	return pclk;
+}
+
 /* s5pc100: return HCLKD0 frequency */
 static unsigned long get_hclk(void)
 {
@@ -318,6 +357,46 @@ unsigned long get_pwm_clk(void)
 unsigned long get_uart_clk(int dev_index)
 {
 	return s5pc1xx_get_uart_clk(dev_index);
+}
+
+unsigned long get_lcd_clk(void)
+{
+	if (cpu_is_s5pc110())
+		return s5pc110_get_lcd_clk();
+
+	return 0;
+}
+
+static void s5pc110_set_lcd_clk(void)
+{
+	struct s5pc110_clock *clk =
+		(struct s5pc110_clock *)samsung_get_base_clock();
+
+	/*
+	 * CLK_SRC1
+	 * MOUT_FIMD [20:23]
+	 * set parent to MPLL
+	 */
+	clrsetbits_le32(&clk->src1, 0xf << 20, 0x6 << 20);
+
+	/*
+	 * CLK_SRC_MASK0
+	 * SCLK_FIMD [5]
+	 */
+	setbits_le32(&clk->gate_sclk0, 1 << 5);
+
+	/*
+	 * CLK_DIV1
+	 * DOUT_FIMD [20:23]
+	 * set FIMD ratio
+	 */
+	clrsetbits_le32(&clk->div1, 0xf << 20, 0x4);
+}
+
+void set_lcd_clk(void)
+{
+	if (cpu_is_s5pc110())
+		s5pc110_set_lcd_clk();
 }
 
 void set_mmc_clk(int dev_index, unsigned int div)
