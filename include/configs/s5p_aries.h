@@ -176,4 +176,6 @@
 
 #define CONFIG_USB_GADGET_DWC2_OTG_PHY
 
+#define CONFIG_EXYNOS_FB
+
 #endif	/* __CONFIG_H */

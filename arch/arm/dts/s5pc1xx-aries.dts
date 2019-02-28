@@ -196,11 +196,40 @@
 		};
 	};
 
-	framebuffer {
-		compatible = "simple-framebuffer";
-		reg = <0x4ec00000 0x177000>;
-		width = <480>;
-		height = <800>;
-		format = "a8b8g8r8";
+	spi_lcd: spi-soft {
+		compatible = "spi-gpio";
+		cs-gpios = <&gpmp01 1 0>;
+		gpio-sck = <&gpmp04 1 0>;
+		gpio-mosi = <&gpmp04 3 0>;
+		spi-delay-us = <1>; /* 1200000 Hz */
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		s6e63m0: display@0 {
+			compatible = "samsung,s6e63m0";
+			reg = <0>;
+			spi-max-frequency = <1200000>;
+			spi-cpol;
+			spi-cpha;
+			reset-gpios = <&gpmp05 5 1>;
+		};
+	};
+
+	fimd@f8000000 {
+		compatible = "samsung,exynos-fimd";
+		reg = <0xf8000000 0x20000>;
+
+		samsung,vl-col = <480>;
+		samsung,vl-row = <800>;
+		samsung,vl-freq = <60>;
+		samsung,vl-bpix = <4>;
+		samsung,vl-hspw = <2>;
+		samsung,vl-hfpd = <16>;
+		samsung,vl-hbpd = <16>;
+		samsung,vl-vspw = <2>;
+		samsung,vl-vfpd =  <28>;
+		samsung,vl-vbpd = <1>;
+
+		u-boot,dm-pre-reloc;
 	};
 };
