@@ -7,7 +7,8 @@
 # Guennadi Liakhovetki, DENX Software Engineering, <lg@denx.de>
 
 ifdef CONFIG_SPL_BUILD
-obj-y	+= sgs_ibl.o
+obj-y  += sgs_ibl.o
+obj-y	+= lowlevel_init.o
 obj-y	+= mem_setup.o
 obj-y	+= spl_build.o
 hostprogs-y := tools/mkariesspl
