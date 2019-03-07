@@ -181,7 +181,7 @@ skip_check_didle:
 	add	r2, r0, #0x00200000
 
 	/* Disable all interrupts (VIC0, VIC1 and VIC2) */
-	mvn     r3, #0x0
+	mvn	r3, #0x0
 	str	r3, [r0, #0x14]				@ INTENCLEAR
 	str	r3, [r1, #0x14]				@ INTENCLEAR
 	str	r3, [r2, #0x14]				@ INTENCLEAR
@@ -209,57 +209,28 @@ skip_check_didle:
 	/* init system clock */
 	bl	system_clock_init
 
-	cmp	r7, r8
-	beq	board_detect
-
-	/* OneNAND GPIO setting */
-	ldr	r1, [r8, #0x2E0]			@ MP01CON_OFFSET
-	orr	r1, #0x00550000
-	str	r1, [r8, #0x2E0]			@ MP01CON_OFFSET
-
-	ldr	r1, [r8, #0x320]			@ MP03CON_OFFSET
-	orr	r1, #0x0550
-	orr	r1, #0x00550000
-	str	r1, [r8, #0x320]			@ MP03CON_OFFSET
-
-	ldr	r1, =0xFFFF
-	str	r1, [r8, #0x2EC]			@ MP01DRV_SR_OFFSET
-	str	r1, [r8, #0x32C]			@ MP03DRV_SR_OFFSET
-	str	r1, [r8, #0x38C]			@ MP06DRV_SR_OFFSET
-	str	r1, [r8, #0x3AC]			@ MP07DRV_SR_OFFSET
-
-	ldr	r0, =0xB0600000
-
-wait_orwb:
-	ldr	r1, [r0, #0x10C]			@ ONENAND_IF_STATUS
-	bic	r1, r1, #0xFFFFFFFE
-	cmp	r1, #0x0
-	bne	wait_orwb
-
 	/* OneNAND Sync Read Support at S5PC110 only
 	 * RM[15]	: Sync Read
-	 * BRWL[14:12]	: 7 CLK
+	 * BRWL[14:12]	: 6 CLK
 	 * BL[11:9]	: Continuous
 	 * HF[2]	: High Frequency Enable (Over 66MHz)
 	 * WM[1]	: Sync Write
 	 */
-	ldr	r1, =0xF006
-	ldr	r0, =0xB001E442
-	strh	r1, [r0]
-
-	/* read dummy halfwords */
-	ldrh	r0, [r1]
-	ldrh	r0, [r1]
+	cmp	r7, r8
+	ldrne	r1, =0xE006
+	ldrne	r0, =0xB001E442
+	strneh	r1, [r0]
 
 	/*
 	 * GCE[26]	: Gated Clock Enable
 	 * RPE[17]	: Enables Read Prefetch
 	 */
-	ldr	r1, =((1 << 26) | (1 << 17) | 0xF006)
-	ldr	r0, =0xB0600000
-	str	r1, [r0, #0x100]			@ ONENAND_IF_CTRL
+	ldrne	r1, =((1 << 26) | (1 << 17) | 0xE006)
+	ldrne	r0, =0xB0600000
+	strne	r1, [r0, #0x100]			@ ONENAND_IF_CTRL
+	ldrne	r1, =0x1212
+	strne	r1, [r0, #0x108]
 
-board_detect:
 	/* Board detection to set proper memory configuration */
 	cmp	r7, r8
 	moveq	r9, #1		/* r9 has 1Gib default at s5pc100 */
