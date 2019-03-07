@@ -50,13 +50,13 @@ void board_init_f(unsigned long bootflag)
 	reg |= 0x301;
 	writel(reg, S5PC110_PS_HOLD_CTRL);
 
-#if 0
+#if 1
 	/* Use blob init_by_rebell to initialize memory and clocks
 	 * Results in working display */
 	do_ibl();
 
 	/* Clears interrupts and enable them for SBL from USB loading */
-	init_system();
+	irom_enable_interrupts();
 #else
 	/* Use u-boot's clock and memory init
 	 * Display doesn't work in SBL
@@ -67,7 +67,7 @@ void board_init_f(unsigned long bootflag)
 	irom_enable_interrupts();
 #endif
 
-#if 0
+#if 1
 	/* Load stock SBL from OneNAND
 	 * Currently not working for some reason
 	 */
