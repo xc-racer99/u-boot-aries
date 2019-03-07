@@ -6,8 +6,7 @@
  */
 #include <stdio.h>
 
-/* BL1 total size 16k, but because the resulting file is connected to a signed one, it is only 12k */ 
-#define BL1_LENGTH		(12*1024)
+#define BL1_LENGTH		(8*1024)
 #define BL1_PAD_LENGTH		BL1_LENGTH
 #define BL1_PAD2_LENGTH		BL1_LENGTH
 
