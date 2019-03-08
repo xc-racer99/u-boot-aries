@@ -19,7 +19,10 @@
 #include <asm/arch/cpu.h>		/* get chip and board defs */
 
 #define CONFIG_ARCH_CPU_INIT
+
+#ifdef CONFIG_SPL_BUILD
 #define CONFIG_SKIP_LOWLEVEL_INIT_ONLY
+#endif
 
 /* Disable L2 cache - enabling causes slowdowns of ~50% in Linux */
 #define CONFIG_SYS_L2CACHE_OFF

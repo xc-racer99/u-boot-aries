@@ -61,15 +61,6 @@ u32 get_board_rev(void)
 	return hwrev;
 }
 
-int board_early_init_f(void)
-{
-	gpio_set_pull(S5PC110_GPIO_MP057, S5P_GPIO_PULL_UP);
-	gpio_cfg_pin(S5PC110_GPIO_MP057, S5P_GPIO_INPUT);
-	gpio_set_value(S5PC110_GPIO_MP057, 1);
-
-	return 0;
-}
-
 int board_init(void)
 {
 	/* Set Initial global variables */

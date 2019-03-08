@@ -20,8 +20,14 @@
  * r9 has Mobile DDR size, 1 means 1GiB, 2 means 2GiB and so on
  */
 
+#ifdef CONFIG_SPL_BUILD
 	.globl do_lowlevel_init
 do_lowlevel_init:
+#else
+	/* TODO: Figure out the linker bug that causes do_lowlevel_init() not to work */
+	.globl lowlevel_init
+lowlevel_init:
+#endif
 	mov	r10, lr
 
 	/* r5 has always zero */
@@ -37,6 +43,7 @@ do_lowlevel_init:
 	cmp	r0, r5
 	beq	100f
 	ldr	r8, =S5PC110_GPIO_BASE
+
 100:
 	/* Turn on KEY_LED_ON [GPJ4(1)] XMSMWEN */
 	cmp	r7, r8
