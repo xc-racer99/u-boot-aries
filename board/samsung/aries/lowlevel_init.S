@@ -445,7 +445,7 @@ system_clock_init:
 	ldr	r1, =0x829B0C01			@ 667MHz
 	str	r1, [r0, #0x108]
 	/* S5PC110_EPLL_CON */
-	ldr	r1, =0x80600602			@  96MHz VSEL 0 P 6 M 96 S 2
+	ldr	r1, =0x88500303			@  96MHz VSEL 0 P 6 M 96 S 2 -> 80MHz 0x80600602
 	str	r1, [r0, #0x110]
 	/* S5PC110_VPLL_CON */
 	ldr	r1, =0x806C0603			@  54MHz
@@ -454,6 +454,9 @@ system_clock_init:
 	/* Set Source Clock */
 	ldr	r1, =0x10001111			@ A, M, E, VPLL Muxing
 	str	r1, [r0, #0x200]		@ S5PC1XX_CLK_SRC0
+
+	ldr	r1, =0x66667777			@ S5PC110_CLK_SRC4 (UART/MMC)
+	str	r1, [r0, #0x210]
 
 	/* OneDRAM(DMC0) clock setting */
 	ldr	r1, =0x01000000			@ ONEDRAM_SEL[25:24] 1 SCLKMPLL
@@ -472,7 +475,7 @@ system_clock_init:
 	str	r1, [r0, #0x460]		@ S5PC110_CLK_IP0
 
 	/* CLK_IP1 */
-	ldr	r1, =0xe9fdf0f9			@ FIMD[0] USBOTG[16]
+	ldr	r1, =0xe9fdf0fb			@ FIMD[0] USBOTG[16]
 						@ NANDXL[24]
 	str	r1, [r0, #0x464]		@ S5PC110_CLK_IP1
 
