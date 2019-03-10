@@ -63,14 +63,12 @@ void board_init_f(unsigned long bootflag)
 	 */
 	do_lowlevel_init();
 
-	/* Enables interrupts for SBL from USB loading */
+	/* Enables interrupts for SBL as they appear to be necessary */
 	irom_enable_interrupts();
 #endif
 
 #if 1
-	/* Load stock SBL from OneNAND
-	 * Currently not working for some reason
-	 */
+	/* Load stock SBL from OneNAND */
 	onenand_spl_load_image(0xa80000,
 			0x140000, (void *) 0x40244000);
 
