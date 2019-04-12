@@ -20,7 +20,7 @@ mem_ctrl_asm_init:
 	ldr	r1, =0x50101000
 	str	r1, [r0, #0x018]			@ PHYCONTROL0_OFFSET
 	strne	r1, [r6, #0x018]			@ PHYCONTROL0_OFFSET
-	ldr	r1, =0x000000f4
+	ldr	r1, =0x00000084
 	str	r1, [r0, #0x01C]			@ PHYCONTROL1_OFFSET
 	strne	r1, [r6, #0x01C]			@ PHYCONTROL1_OFFSET
 	ldreq	r1, =0x0
@@ -47,8 +47,9 @@ wait:	subs	r2, r2, #0x1
 	strne	r1, [r6, #0x018]			@ PHYCONTROL0_OFFSET
 
 	/* DLL off */
-	ldr	r1, =0x50101009
+	ldr	r1, =0x60101001
 	str	r1, [r0, #0x018]			@ PHYCONTROL0_OFFSET
+	ldr	r1, =0x50101001
 	strne	r1, [r6, #0x018]			@ PHYCONTROL0_OFFSET
 
 	/* auto refresh off */
@@ -81,8 +82,8 @@ wait:	subs	r2, r2, #0x1
 	 * [ 7:4 ] 2: 14 bits
 	 * [ 3:0 ] 2: 4 banks
 	 */
-	ldr	r3, =0x30f80222
-	ldr	r4, =0x40f00222
+	ldr	r3, =0x30F82222
+	ldr	r4, =0x40F02222
 swap_memory:
 	str	r3, [r0, #0x008]			@ MEMCONFIG0_OFFSET
 	str	r4, [r0, #0x00C]			@ dummy write
@@ -110,6 +111,8 @@ swap_memory:
 	ldreq	r5, =0x50f01312				@ 2Gib + 2Gib: MCP E
 
 	cmp	r7, r8
+	ldr	r4, =0x40F01322
+	ldr	r5, =0x50F81222
 	strne	r4, [r6, #0x008]			@ MEMCONFIG0_OFFSET
 	strne	r5, [r6, #0x00C]			@ MEMCONFIG1_OFFSET
 
@@ -125,7 +128,7 @@ swap_memory:
 	eoreq	r3, r3, #0x08000000
 	streq	r3, [r0, #0xc]				@ MEMCONFIG1_OFFSET
 
-	ldr	r1, =0x20000000
+	ldr	r1, =0xff000000
 	str	r1, [r0, #0x014]			@ PRECHCONFIG_OFFSET
 	strne	r1, [r0, #0x014]			@ PRECHCONFIG_OFFSET
 	strne	r1, [r6, #0x014]			@ PRECHCONFIG_OFFSET
@@ -155,7 +158,7 @@ swap_memory:
 
 	ldr	r1, =0x12130005
 	str	r1, [r0, #0x038]			@ TIMINGDATA_OFFSET
-	ldrne	r1, =0x13130005
+	ldrne	r1, =0x23130005
 	strne	r1, [r6, #0x038]			@ TIMINGDATA_OFFSET
 
 	ldr	r1, =0x0E140222
@@ -220,12 +223,12 @@ swap_memory:
 	strne	r1, [r6, #0x010]			@ DIRECTCMD_OFFSET
 
 	/* auto refresh on */
-	ldr	r1, =0xFF002030 | (1 << 7)
+	ldr	r1, =0x0fff13b0
 	str	r1, [r0, #0x000]			@ CONCONTROL_OFFSET
 	strne	r1, [r6, #0x000]			@ CONCONTROL_OFFSET
 
 	/* PwrdnConfig */
-	ldr	r1, =0x00100002
+	ldr	r1, =0xffff00ff
 	str	r1, [r0, #0x028]			@ PWRDNCONFIG_OFFSET
 	strne	r1, [r6, #0x028]			@ PWRDNCONFIG_OFFSET
 
