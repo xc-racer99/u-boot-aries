@@ -7,9 +7,8 @@
 #include <stdio.h>
 #include "BL1_stage1_bin.h"
 
-#define BL1_LENGTH		(8*1024)
-#define BL1_BEFORE_PAD_LENGTH	0x86C
-#define BL1_AFTER_PAD_LENGTH	BL1_LENGTH
+#define BL1_BEFORE_PAD_LENGTH	4096 + 0x10
+#define BL1_AFTER_PAD_LENGTH	4096 + 8192
 
 int make_image(char* input_file, char* output_file)
 {
