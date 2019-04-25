@@ -33,9 +33,15 @@
 /* DRAM Base */
 #define CONFIG_SYS_SDRAM_BASE		0x30000000
 
-/* SPL Settings */
-#define CONFIG_SPL_TEXT_BASE		0xD0022010
-#define CONFIG_SPL_MAX_FOOTPRINT	((14 << 10) - 4)
+/*
+ * The SPL is copied to 0xD0020800 and this should be the text
+ * base, but the signed first-stage bootloader instead calls
+ * 0xD002086C to try and run a verification code as this is
+ * where it was located.  Make our text base 0xD002086C and
+ * pad the start of it with NOP instructions in mkariesspl
+ */
+#define CONFIG_SPL_TEXT_BASE		0xD002086C
+#define CONFIG_SPL_MAX_FOOTPRINT	(0x2000 - 0x86C)
 #define CONFIG_SPL_STACK		0xD0036000
 
 /* Max u-boot.bin size - 3 256K OneNAND pages */
