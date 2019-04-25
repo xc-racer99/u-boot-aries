@@ -5,6 +5,7 @@
  *	djpark (2009.08.10)
  */
 #include <stdio.h>
+#include "BL1_stage1_bin.h"
 
 #define BL1_LENGTH		(8*1024)
 #define BL1_BEFORE_PAD_LENGTH	0x86C
@@ -31,6 +32,9 @@ int make_image(char* input_file, char* output_file)
 		printf("File open error! - %s\n", output_file);
 		goto err;
 	}
+
+	/* Signed shim */
+	fwrite(BL1_stage1_bin, sizeof(unsigned char), BL1_stage1_bin_len, fp_write);
 
 	/* Pad before the start of the SPL */
 	for (; length < BL1_BEFORE_PAD_LENGTH; length += 4)
