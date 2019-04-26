@@ -40,7 +40,7 @@
  * where it was located.  Make our text base 0xD002086C and
  * pad the start of it with NOP instructions in mkariesspl
  */
-#define CONFIG_SPL_TEXT_BASE		0xD0022010
+#define CONFIG_SPL_TEXT_BASE		0xD002086C
 #define CONFIG_SPL_MAX_FOOTPRINT	(0x2000 - 0x86C)
 #define CONFIG_SPL_STACK		0xD0036000
 
