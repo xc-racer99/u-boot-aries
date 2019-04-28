@@ -7,8 +7,7 @@
 #include <stdio.h>
 #include "BL1_stage1_bin.h"
 
-#define BL1_BEFORE_PAD_LENGTH	0x6C
-#define BL1_AFTER_PAD_LENGTH	0x2000
+#define BL1_PAD_LENGTH	0x2000
 
 int make_image(char* input_file, char* output_file)
 {
@@ -35,12 +34,6 @@ int make_image(char* input_file, char* output_file)
 	/* Signed shim */
 	fwrite(BL1_stage1_bin, sizeof(unsigned char), BL1_stage1_bin_len, fp_write);
 
-	/* Pad before the start of the SPL */
-	for (; length < BL1_BEFORE_PAD_LENGTH; length += 4)
-	{
-		fwrite(&data, sizeof(unsigned int), 1, fp_write);
-	}
-
 	while ((ret = fread(&data, sizeof(unsigned int), 1, fp_read)))
 	{
 		length += 4;
@@ -48,7 +41,7 @@ int make_image(char* input_file, char* output_file)
 	}
 
 	data = 0;
-	for (; length < BL1_AFTER_PAD_LENGTH; length += 4)
+	for (; length < BL1_PAD_LENGTH; length += 4)
 	{
 		fwrite(&data, sizeof(unsigned int), 1, fp_write);
 	}
