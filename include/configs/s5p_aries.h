@@ -33,14 +33,7 @@
 /* DRAM Base */
 #define CONFIG_SYS_SDRAM_BASE		0x30000000
 
-/*
- * The SPL is copied to 0xD0020800 and while this is theoretically
- * the text base, but after the signed first-stage bootloader copys
- * it here, it tries to run a verification function which was located
- * at 0xD002086C.
- * Make our text base 0xD002086C and pad the start in mkariesspl
- */
-#define CONFIG_SPL_TEXT_BASE		0xD0021000
+#define CONFIG_SPL_TEXT_BASE		0xD0032000
 #define CONFIG_SPL_MAX_FOOTPRINT	0x2000
 #define CONFIG_SPL_STACK		0xD0036000
 
