@@ -33,7 +33,7 @@
 /* DRAM Base */
 #define CONFIG_SYS_SDRAM_BASE		0x30000000
 
-#define CONFIG_SPL_TEXT_BASE		0xD0032000
+#define CONFIG_SPL_TEXT_BASE		0xD0021000
 #define CONFIG_SPL_MAX_FOOTPRINT	0x2000
 #define CONFIG_SPL_STACK		0xD0036000
 
@@ -135,7 +135,7 @@
 		"setenv bootargs ${mtdparts} ubi.mtd=ubi androidboot.mode=${boot_mode} androidboot.serialno=${serial#};" \
 		"onenand read ${kernel_load_addr} ${onenand_load_offset} 0xA00000;" \
 		"bootm ${kernel_load_addr};\0" \
-	"bootmenu_0=Fastboot=ubi part ubi; fastboot usb 0; bootd;\0" \
+	"bootmenu_0=Erase OneNAND IBL+PBL=onenand erase 0x0 0x40000; sleep 5; bootd;\0" \
 	"bootmenu_1=Update U-Boot from SD Card Partition 1=run uboot_update; sleep 5; bootd;\0" \
 	"bootmenu_2=OneNAND Main Boot=setenv boot_mode normal; setenv onenand_load_offset 0x1980000; run onenand_boot;\0" \
 	"bootmenu_3=OneNAND Recovery Boot=setenv boot_mode recovery; setenv onenand_load_offset 0x2380000; run onenand_boot;\0" \
