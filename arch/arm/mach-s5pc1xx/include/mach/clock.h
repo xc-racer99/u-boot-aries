@@ -60,19 +60,30 @@ struct s5pc110_clock {
 	unsigned int	src1;
 	unsigned int	src2;
 	unsigned int	src3;
-	unsigned char	res9[0xf0];
+	unsigned int	src4;
+	unsigned int	src5;
+	unsigned int	src6;
+	unsigned char	res9[0x64];
+	unsigned int	src_mask0;
+	unsigned int	src_mask1;
+	unsigned char	res10[0x78];
 	unsigned int	div0;
 	unsigned int	div1;
 	unsigned int	div2;
 	unsigned int	div3;
 	unsigned int	div4;
-	unsigned char	res10[0x1ec];
-	unsigned int	gate_d00;
-	unsigned int	gate_d01;
-	unsigned int	gate_d02;
-	unsigned char	res11[0x54];
-	unsigned int	gate_sclk0;
-	unsigned int	gate_sclk1;
+	unsigned int	div5;
+	unsigned int	div6;
+	unsigned int	div7;
+	unsigned char	res11[0x140];
+	unsigned int	gate_ip0;
+	unsigned int	gate_ip1;
+	unsigned int	gate_ip2;
+	unsigned int	gate_ip3;
+	unsigned int	gate_ip4;
+	unsigned char	res12[0xc];
+	unsigned int	gate_block;
+	unsigned int	gate_ip5;
 };
 #endif
 
