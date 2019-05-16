@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Samsung's S5PC110-based first generation Galaxy S common board device tree source
+ * Samsung's S5PC110-based Goni board device tree source
  *
  * Copyright (c) 2014 Google, Inc
  */
@@ -8,11 +8,11 @@
 /dts-v1/;
 
 #include "skeleton.dtsi"
-#include "s5pc110-pinctrl.dtsi"
+#include "exynos3110-pinctrl.dtsi"
 
 / {
-	model = "Samsung Aries based on S5PC110";
-	compatible = "samsung,aries", "samsung,s5pc110";
+	model = "Samsung Goni based on S5PC110/Exynos3110";
+	compatible = "samsung,goni", "samsung,s5pc110", "samsung,exynos3110";
 
 	aliases {
 		serial2 = "/serial@e2900800";
@@ -30,20 +30,6 @@
 		compatible = "samsung,exynos4210-uart";
 		reg = <0xe2900800 0x400>;
 		id = <2>;
-	};
-
-	i2c_musb: i2c-musb {
-		compatible = "i2c-gpio";
-		gpios = <&gpj3 4 0>, /* sda */
-			<&gpj3 5 0>; /* scl */
-		i2c-gpio,delay-us = <2>;        /* ~100 kHz */
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		fsa9480@25 {
-			compatible = "fcs,fsa9480";
-			reg = <0x25 0 0>;
-		};
 	};
 
 	i2c_pmic: i2c-pmic {
@@ -210,40 +196,4 @@
 		};
 	};
 
-	spi_lcd: spi-soft {
-		compatible = "spi-gpio";
-		cs-gpios = <&gpmp01 1 0>;
-		gpio-sck = <&gpmp04 1 0>;
-		gpio-mosi = <&gpmp04 3 0>;
-		spi-delay-us = <1>; /* 1200000 Hz */
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		s6e63m0: display@0 {
-			compatible = "samsung,s6e63m0";
-			reg = <0>;
-			spi-max-frequency = <1200000>;
-			spi-cpol;
-			spi-cpha;
-			reset-gpios = <&gpmp05 5 1>;
-		};
-	};
-
-	fimd@f8000000 {
-		compatible = "samsung,exynos-fimd";
-		reg = <0xf8000000 0x20000>;
-
-		samsung,vl-col = <480>;
-		samsung,vl-row = <800>;
-		samsung,vl-freq = <60>;
-		samsung,vl-bpix = <4>;
-		samsung,vl-hspw = <2>;
-		samsung,vl-hfpd = <16>;
-		samsung,vl-hbpd = <16>;
-		samsung,vl-vspw = <2>;
-		samsung,vl-vfpd =  <28>;
-		samsung,vl-vbpd = <1>;
-
-		u-boot,dm-pre-reloc;
-	};
 };

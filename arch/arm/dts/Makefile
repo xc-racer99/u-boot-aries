@@ -6,10 +6,10 @@ dtb-$(CONFIG_AT91FAMILY) += at91sam9260-smartweb.dtb \
 	at91sam9g45-gurnard.dtb
 
 dtb-$(CONFIG_S5PC100) += s5pc1xx-smdkc100.dtb
-dtb-$(CONFIG_EXYNOS3) += s5pc1xx-aries.dtb \
-	s5pc1xx-fascinate4g.dtb \
-	s5pc1xx-galaxys.dtb \
-	s5pc1xx-goni.dtb
+dtb-$(CONFIG_EXYNOS3) += exynos3110-aries.dtb \
+	exynos3110-fascinate4g.dtb \
+	exynos3110-galaxys.dtb \
+	exynos3110-goni.dtb
 dtb-$(CONFIG_EXYNOS4) += exynos4210-origen.dtb \
 	exynos4210-smdkv310.dtb \
 	exynos4210-universal_c210.dtb \
