@@ -383,14 +383,21 @@ static void s5pc110_set_lcd_clk(void)
 	 * CLK_SRC_MASK0
 	 * SCLK_FIMD [5]
 	 */
-	setbits_le32(&clk->gate_sclk0, 1 << 5);
+	setbits_le32(&clk->src_mask0, 1 << 5);
 
 	/*
 	 * CLK_DIV1
 	 * DOUT_FIMD [20:23]
 	 * set FIMD ratio
 	 */
-	clrsetbits_le32(&clk->div1, 0xf << 20, 0x4);
+	clrsetbits_le32(&clk->div1, 0xf << 20, 0x4 << 20);
+
+	/*
+	 * CLK_GATE_IP1
+	 * CLK_FIMD[0]
+	 * enable FIMD clock
+	 */
+	setbits_le32(&clk->gate_ip1, 1 << 0);
 }
 
 void set_lcd_clk(void)
