@@ -83,16 +83,19 @@ int exynos_power_init(void)
 
 	/* LDO7 1.8V */
 	val = 0x02; /* (1800 - 1600) / 100; */
-	ret |= pmic_reg_write(dev,  MAX8998_REG_LDO7, val);
+	ret |= pmic_reg_write(dev, MAX8998_REG_LDO7, val);
 
 	/* LDO17 3.0V */
 	val = 0xe; /* (3000 - 1600) / 100; */
-	ret |= pmic_reg_write(dev,  MAX8998_REG_LDO17, val);
+	ret |= pmic_reg_write(dev, MAX8998_REG_LDO17, val);
 
-	reg = pmic_reg_read(dev, MAX8998_REG_ONOFF1);
-	reg |= MAX8998_LDO7 | MAX8998_LDO17;
-	ret |= pmic_reg_write(dev, MAX8998_REG_ONOFF1, reg);
+	reg = pmic_reg_read(dev, MAX8998_REG_ONOFF3);
+	reg |= MAX8998_LDO17;
+	ret = pmic_reg_write(dev, MAX8998_REG_ONOFF3, reg);
 
+	reg = pmic_reg_read(dev, MAX8998_REG_ONOFF2);
+	reg |= MAX8998_LDO7;
+	ret = pmic_reg_write(dev, MAX8998_REG_ONOFF2, reg);
 
 	if (ret) {
 		pr_err("MAX8998 LDO setting error!\n");
