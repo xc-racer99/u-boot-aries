@@ -357,6 +357,7 @@ void setup_android_options(int pressed)
 int setup_bootcmd(void)
 {
 	int vol_up, vol_down;
+	int power = S5PC110_GPIO_H26;
 	int home = -1;
 	int pressed = 0;
 	int num_mmc = 2;
@@ -383,11 +384,31 @@ int setup_bootcmd(void)
 			break;
 	}
 
-	gpio_request(vol_up, "volume_up");
-	gpio_request(vol_down, "volume_down");
+	/* this is necessary on non-SGS4G devices for working volume keys */
+	if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
+		gpio_request(S5PC110_GPIO_H21, "kbc1");
+		gpio_cfg_pin(S5PC110_GPIO_H21, S5P_GPIO_OUTPUT);
+		gpio_set_pull(S5PC110_GPIO_H21, S5P_GPIO_PULL_NONE);
+		gpio_set_value(S5PC110_GPIO_H21, 0);
+	}
 
-	if (home > 0)
+	gpio_request(power, "power");
+	gpio_cfg_pin(power, S5P_GPIO_INPUT);
+	gpio_set_pull(power, S5P_GPIO_PULL_NONE);
+
+	gpio_request(vol_up, "volume_up");
+	gpio_cfg_pin(vol_up, S5P_GPIO_INPUT);
+	gpio_set_pull(vol_up, S5P_GPIO_PULL_NONE);
+
+	gpio_request(vol_down, "volume_down");
+	gpio_cfg_pin(vol_down, S5P_GPIO_INPUT);
+	gpio_set_pull(vol_down, S5P_GPIO_PULL_NONE);
+
+	if (home > 0) {
 		gpio_request(home, "home");
+		gpio_cfg_pin(home, S5P_GPIO_INPUT);
+		gpio_set_pull(home, S5P_GPIO_PULL_NONE);
+	}
 
 	if (gpio_get_value(vol_up) == 0)
 		pressed |= KEY_VOLUME_UP;
