@@ -32,3 +32,40 @@ void enable_caches(void)
 	dcache_enable();
 }
 #endif
+
+#ifndef CONFIG_SYS_L2CACHE_OFF
+void v7_outer_cache_enable_exynos3110(void)
+{
+	__asm(
+		"push    {r0, r1, r2, lr}\n\t"
+		"mrc     15, 0, r3, cr1, cr0, 1\n\t"
+		"orr     r3, r3, #2\n\t"
+		"mcr     15, 0, r3, cr1, cr0, 1\n\t"
+		"pop     {r1, r2, r3, pc}"
+	);
+}
+
+void v7_outer_cache_disable_exynos3110(void)
+{
+	__asm(
+		"push    {r0, r1, r2, lr}\n\t"
+		"mrc     15, 0, r3, cr1, cr0, 1\n\t"
+		"bic     r3, r3, #2\n\t"
+		"mcr     15, 0, r3, cr1, cr0, 1\n\t"
+		"pop     {r1, r2, r3, pc}"
+	);
+}
+
+void v7_outer_cache_enable_exynos3110(void)
+{
+	if (proid_is_exynos3110())
+		v7_outer_cache_enable_exynos3110();
+}
+
+void v7_outer_cache_disable_exynos3110(void)
+{
+	if (proid_is_exynos3110())
+		v7_outer_cache_disable_exynos3110();
+}
+
+#endif
