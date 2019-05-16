@@ -6,7 +6,7 @@ dtb-$(CONFIG_AT91FAMILY) += at91sam9260-smartweb.dtb \
 	at91sam9g45-gurnard.dtb
 
 dtb-$(CONFIG_S5PC100) += s5pc1xx-smdkc100.dtb
-dtb-$(CONFIG_S5PC110) += s5pc1xx-aries.dtb \
+dtb-$(CONFIG_EXYNOS3) += s5pc1xx-aries.dtb \
 	s5pc1xx-fascinate4g.dtb \
 	s5pc1xx-galaxys.dtb \
 	s5pc1xx-goni.dtb

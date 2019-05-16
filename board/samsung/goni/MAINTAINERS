@@ -2,5 +2,5 @@ GONI BOARD
 M:	Robert Baldyga <r.baldyga@samsung.com>
 S:	Maintained
 F:	board/samsung/goni/
-F:	include/configs/s5p_goni.h
-F:	configs/s5p_goni_defconfig
+F:	include/configs/exynos3_goni.h
+F:	configs/exynos3_goni_defconfig

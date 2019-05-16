@@ -1,6 +1,6 @@
 ARIES BOARD
-M:	Robert Baldyga <r.baldyga@samsung.com>
+M:	Jonathan Bakker <xc-racer2@live.ca>
 S:	Maintained
 F:	board/samsung/aries/
-F:	include/configs/s5p_aries.h
-F:	configs/s5p_aries_defconfig
+F:	include/configs/exynos3_aries.h
+F:	configs/exynos3_aries_defconfig

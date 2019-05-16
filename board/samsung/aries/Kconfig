@@ -1,4 +1,4 @@
-if TARGET_S5P_ARIES
+if TARGET_ARIES
 
 config SYS_BOARD
 	default "aries"
@@ -6,10 +6,7 @@ config SYS_BOARD
 config SYS_VENDOR
 	default "samsung"
 
-config SYS_SOC
-	default "s5pc1xx"
-
 config SYS_CONFIG_NAME
-	default "s5p_aries"
+	default "exynos3_aries"
 
 endif
