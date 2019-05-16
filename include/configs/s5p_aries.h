@@ -88,7 +88,7 @@
 	"kernel_load_addr=0x32000000\0" \
 	"fdt_load_addr=0x33000000\0" \
 	"uboot_load_addr=0x33000000\0" \
-	"uboot_onenand_off=0x1200000\0" \
+	"uboot_onenand_off="__stringify(CONFIG_SYS_ONENAND_U_BOOT_OFFS)"\0" \
 	"uboot_onenand_size="__stringify(CONFIG_BOARD_SIZE_LIMIT)"\0" \
 	"meminfo=mem=80M mem=256M@0x40000000 mem=128M@0x50000000\0" \
 	"stdin=serial,gpio-keys,fsa9480\0" \
