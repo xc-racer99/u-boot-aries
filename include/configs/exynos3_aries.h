@@ -10,15 +10,9 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-/* High Level Configuration Options */
-#define CONFIG_SAMSUNG		1	/* in a SAMSUNG core */
-#define CONFIG_S5P		1	/* which is in a S5P Family */
-#define CONFIG_S5PC110		1	/* which is in a S5PC110 */
+#include "exynos-common.h"
 
-#include <linux/sizes.h>
-#include <asm/arch/cpu.h>		/* get chip and board defs */
-
-#define CONFIG_ARCH_CPU_INIT
+#define CONFIG_EXYNOS3		1	/* which is in a Exynos3 */
 
 #ifdef CONFIG_SPL_BUILD
 #define CONFIG_SKIP_LOWLEVEL_INIT_ONLY
@@ -26,9 +20,6 @@
 
 /* Disable L2 cache - enabling causes slowdowns of ~50% in Linux */
 #define CONFIG_SYS_L2CACHE_OFF
-
-/* input clock of PLL: has 24MHz input clock at S5PC110 */
-#define CONFIG_SYS_CLK_FREQ_C110	24000000
 
 /* DRAM Base */
 #define CONFIG_SYS_SDRAM_BASE		0x30000000
@@ -49,15 +40,6 @@
  * because ARIES is already definied
  */
 #define MACH_TYPE_SAMSUNG_ARIES		9999
-
-/* Atags */
-#define CONFIG_SETUP_MEMORY_TAGS
-#define CONFIG_CMDLINE_TAG
-#define CONFIG_REVISION_TAG
-#define CONFIG_INITRD_TAG
-
-/* Size of malloc() pool before and after relocation */
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (80 << 20))
 
 /* MMC */
 #define SDHCI_MAX_HOSTS			4
@@ -154,7 +136,6 @@
 #define MMC_BOOTMENU2	"bootmenu_8"
 #define MMC_BOOTMENU3	"bootmenu_9"
 
-#define CONFIG_SYS_PBSIZE	384	/* Print Buffer Size */
 /* memtest works on */
 #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + 0x5000000)

@@ -10,31 +10,12 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-/* High Level Configuration Options */
-#define CONFIG_SAMSUNG		1	/* in a SAMSUNG core */
-#define CONFIG_S5P		1	/* which is in a S5P Family */
-#define CONFIG_S5PC110		1	/* which is in a S5PC110 */
+#include "exynos-common.h"
 
-#include <linux/sizes.h>
-#include <asm/arch/cpu.h>		/* get chip and board defs */
-
-#define CONFIG_ARCH_CPU_INIT
-
-/* input clock of PLL: has 24MHz input clock at S5PC110 */
-#define CONFIG_SYS_CLK_FREQ_C110	24000000
+#define CONFIG_EXYNOS3		1	/* which is in a Exynos3 */
 
 /* DRAM Base */
 #define CONFIG_SYS_SDRAM_BASE		0x30000000
-
-/* Text Base */
-
-#define CONFIG_SETUP_MEMORY_TAGS
-#define CONFIG_CMDLINE_TAG
-#define CONFIG_REVISION_TAG
-#define CONFIG_INITRD_TAG
-
-/* Size of malloc() pool before and after relocation */
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (80 << 20))
 
 /*
  * select serial console configuration
@@ -147,7 +128,6 @@
 	"opts=always_resume=1\0" \
 	"dfu_alt_info=" CONFIG_DFU_ALT "\0"
 
-#define CONFIG_SYS_PBSIZE	384	/* Print Buffer Size */
 /* memtest works on */
 #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + 0x5000000)
