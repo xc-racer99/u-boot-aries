@@ -63,11 +63,10 @@ switch_to_hypervisor_ret:
 
 /*
  * Setup vector:
- * (OMAP4 and S5PC1XX spl TEXT_BASE is not 32 byte aligned.
- * Continue to use ROM code vector in spl only for these)
+ * (OMAP4 spl TEXT_BASE is not 32 byte aligned.
+ * Continue to use ROM code vector only in OMAP4 spl)
  */
-#if !((defined(CONFIG_OMAP44XX) || defined(CONFIG_ARCH_S5PC1XX)) \
-		&& defined(CONFIG_SPL_BUILD))
+#if !(defined(CONFIG_OMAP44XX) && defined(CONFIG_SPL_BUILD))
 	/* Set V=0 in CP15 SCTLR register - for VBAR to point to vector */
 	mrc	p15, 0, r0, c1, c0, 0	@ Read CP15 SCTLR Register
 	bic	r0, #CR_V		@ V = 0
