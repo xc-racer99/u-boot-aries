@@ -8,7 +8,7 @@
 /dts-v1/;
 
 #include <dt-bindings/input/linux-event-codes.h>
-#include "s5pc1xx-aries.dts"
+#include "exynos3110-aries.dts"
 
 / {
 	model = "Samsung Galaxy S Fascinate 4G based on S5PC110/Exynos3110";
