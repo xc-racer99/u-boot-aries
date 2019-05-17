@@ -43,10 +43,10 @@ static unsigned int get_hwrev(void)
 
 	/* GPIOs to configure */
 	int hwrev_gpios[4] = {
-		S5PC110_GPIO_J02,
-		S5PC110_GPIO_J03,
-		S5PC110_GPIO_J04,
-		S5PC110_GPIO_J07,
+		EXYNOS3110_GPIO_J02,
+		EXYNOS3110_GPIO_J03,
+		EXYNOS3110_GPIO_J04,
+		EXYNOS3110_GPIO_J07,
 	};
 
 	/* Offsets from GPJ0_BASE corresponding to HWREV GPIOs */
@@ -60,7 +60,7 @@ static unsigned int get_hwrev(void)
 	for (i = 0; i < 4; i++) {
 		gpio_cfg_pin(hwrev_gpios[i], S5P_GPIO_INPUT);
 		gpio_set_pull(hwrev_gpios[i], S5P_GPIO_PULL_NONE);
-		board_rev |= get_value(S5PC110_GPIO_BASE + GPJ0_BASE, hwrev_offs[i]) << i;
+		board_rev |= get_value(EXYNOS3110_GPIO_PART1_BASE + GPJ0_BASE, hwrev_offs[i]) << i;
 	}
 
 	return board_rev;
@@ -75,10 +75,10 @@ static bool is_galaxys(void)
 	 * Everything else:
 	 * No external pull-up.  Goes low when interally pulled down.
 	 */
-	gpio_cfg_pin(S5PC110_GPIO_D12, S5P_GPIO_INPUT);
-	gpio_set_pull(S5PC110_GPIO_D12, S5P_GPIO_PULL_DOWN);
+	gpio_cfg_pin(EXYNOS3110_GPIO_D12, S5P_GPIO_INPUT);
+	gpio_set_pull(EXYNOS3110_GPIO_D12, S5P_GPIO_PULL_DOWN);
 
-	return get_value(S5PC110_GPIO_BASE + GPD1_BASE, 2);
+	return get_value(EXYNOS3110_GPIO_PART1_BASE + GPD1_BASE, 2);
 }
 
 static bool is_galaxys4g(void)
@@ -107,10 +107,10 @@ static bool is_captivate(void)
 	 * Everything else:
 	 * No external pull-up.  Goes low when interally pulled down.
 	 */
-	gpio_cfg_pin(S5PC110_GPIO_MP044, S5P_GPIO_INPUT);
-	gpio_set_pull(S5PC110_GPIO_MP044, S5P_GPIO_PULL_DOWN);
+	gpio_cfg_pin(EXYNOS3110_GPIO_MP044, S5P_GPIO_INPUT);
+	gpio_set_pull(EXYNOS3110_GPIO_MP044, S5P_GPIO_PULL_DOWN);
 
-	return get_value(S5PC110_GPIO_BASE + MP04_BASE, 4);
+	return get_value(EXYNOS3110_GPIO_PART1_BASE + MP04_BASE, 4);
 }
 
 enum board guess_board(void)

@@ -141,14 +141,6 @@ struct exynos_fb {
 };
 #endif
 
-/* LCD IF register offset */
-#define S5PC110_LCD_IF_BASE_OFFSET			0x0
-
-static inline unsigned int exynos_fimd_get_base_offset(void)
-{
-	return S5PC110_LCD_IF_BASE_OFFSET;
-}
-
 /*
  *  Register offsets
 */

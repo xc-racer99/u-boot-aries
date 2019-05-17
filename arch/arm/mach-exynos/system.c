@@ -6,6 +6,8 @@
 
 #include <common.h>
 #include <asm/io.h>
+#include <asm/arch/gpio.h>
+#include <asm/arch/power.h>
 #include <asm/arch/system.h>
 
 static void exynos5_set_usbhost_mode(unsigned int mode)
@@ -27,6 +29,19 @@ void set_usbhost_mode(unsigned int mode)
 {
 	if (cpu_is_exynos5())
 		exynos5_set_usbhost_mode(mode);
+}
+
+static void exynos3110_set_system_display(void)
+{
+	int i;
+
+	for (i = EXYNOS3110_GPIO_F00; i < EXYNOS3110_GPIO_F34; i++) {
+		gpio_cfg_pin(i, S5P_GPIO_FUNC(2));
+		gpio_set_pull(i, S5P_GPIO_PULL_NONE);
+		gpio_set_drv(i, S5P_GPIO_DRV_4X);
+	}
+
+	writel(0x2, EXYNOS3110_MDNIE_SEL);
 }
 
 static void exynos4_set_system_display(void)
@@ -63,7 +78,9 @@ static void exynos5_set_system_display(void)
 
 void set_system_display_ctrl(void)
 {
-	if (cpu_is_exynos4())
+	if (cpu_is_exynos3())
+		exynos3110_set_system_display();
+	else if (cpu_is_exynos4())
 		exynos4_set_system_display();
 	else
 		exynos5_set_system_display();

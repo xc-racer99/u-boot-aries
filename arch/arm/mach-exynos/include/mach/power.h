@@ -1674,7 +1674,6 @@ struct exynos5420_power {
 	unsigned int	cmu_reset_wcore_status;
 	unsigned int	cmu_reset_wcore_option;
 };
-#endif	/* __ASSEMBLY__ */
 
 #define OM_PIN_BITS	0x1f
 #define OM_PIN_SHIFT	0x1
@@ -1753,5 +1752,23 @@ uint32_t get_reset_status(void);
 
 /* Read the resume function and call it */
 void power_exit_wakeup(void);
+
+#endif	/* __ASSEMBLY__ */
+
+#define EXYNOS3110_RST_STAT		0xE010A000
+#define EXYNOS3110_MDNIE_SEL		0xE0107008
+#define EXYNOS3110_SLEEP_WAKEUP		(1 << 3)
+#define EXYNOS3110_WAKEUP_STAT		0xE010C200
+#define EXYNOS3110_OTHERS		0xE010E000
+#define EXYNOS3110_USB_PHY_CON		0xE010E80C
+#define EXYNOS3110_PS_HOLD_CTRL		0xE010E81C
+#define EXYNOS3110_INFORM0		0xE010F000
+#define EXYNOS3110_INFORM1		0xE010F004
+#define EXYNOS3110_INFORM2		0xE010F008
+#define EXYNOS3110_INFORM3		0xE010F00c
+#define EXYNOS3110_INFORM4		0xE010F010
+#define EXYNOS3110_INFORM5		0xE010F014
+#define EXYNOS3110_INFORM6		0xE010F018
+#define EXYNOS3110_INFORM7		0xE010F00c
 
 #endif

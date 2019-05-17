@@ -44,10 +44,10 @@ u32 get_board_rev(void)
 	u32 hwrev = 0;
 
 	int hwrev_gpios[4] = {
-		S5PC110_GPIO_J02,
-		S5PC110_GPIO_J03,
-		S5PC110_GPIO_J04,
-		S5PC110_GPIO_J07,
+		EXYNOS3110_GPIO_J02,
+		EXYNOS3110_GPIO_J03,
+		EXYNOS3110_GPIO_J04,
+		EXYNOS3110_GPIO_J07,
 	};
 
 	for (i = 0; i < 4; i++) {
@@ -108,10 +108,10 @@ int exynos_power_init(void)
 #ifdef CONFIG_SYS_I2C_INIT_BOARD
 void i2c_init_board(void)
 {
-	gpio_request(S5PC110_GPIO_J43, "i2c_clk");
-	gpio_request(S5PC110_GPIO_J40, "i2c_data");
-	gpio_direction_output(S5PC110_GPIO_J43, 1);
-	gpio_direction_output(S5PC110_GPIO_J40, 1);
+	gpio_request(EXYNOS3110_GPIO_J43, "i2c_clk");
+	gpio_request(EXYNOS3110_GPIO_J40, "i2c_data");
+	gpio_direction_output(EXYNOS3110_GPIO_J43, 1);
+	gpio_direction_output(EXYNOS3110_GPIO_J40, 1);
 }
 #endif
 
@@ -170,12 +170,12 @@ int board_mmc_init(bd_t *bis)
 	 * SD card (T_FLASH) detect and init
 	 * T_FLASH_DETECT: EINT28: GPH3[4] input mode
 	 */
-	gpio_request(S5PC110_GPIO_H34, "t_flash_detect");
-	gpio_cfg_pin(S5PC110_GPIO_H34, S5P_GPIO_INPUT);
-	gpio_set_pull(S5PC110_GPIO_H34, S5P_GPIO_PULL_UP);
+	gpio_request(EXYNOS3110_GPIO_H34, "t_flash_detect");
+	gpio_cfg_pin(EXYNOS3110_GPIO_H34, S5P_GPIO_INPUT);
+	gpio_set_pull(EXYNOS3110_GPIO_H34, S5P_GPIO_PULL_UP);
 
-	for (i = S5PC110_GPIO_G20; i < S5PC110_GPIO_G27; i++) {
-		if (i == S5PC110_GPIO_G22)
+	for (i = EXYNOS3110_GPIO_G20; i < EXYNOS3110_GPIO_G27; i++) {
+		if (i == EXYNOS3110_GPIO_G22)
 			continue;
 
 		/* GPG2[0:6] special function 2 */
@@ -193,8 +193,8 @@ int board_mmc_init(bd_t *bis)
 	/* Now register emmc for devices with it */
 	if (cur_board != BOARD_FASCINATE4G && cur_board != BOARD_GALAXYS4G) {
 		/* MASSMEMORY_EN: XMSMDATA7: GPJ2[7] output high */
-		gpio_request(S5PC110_GPIO_J27, "massmemory_en");
-		gpio_direction_output(S5PC110_GPIO_J27, 1);
+		gpio_request(EXYNOS3110_GPIO_J27, "massmemory_en");
+		gpio_direction_output(EXYNOS3110_GPIO_J27, 1);
 
 		/*
 		 * MMC0 GPIO
@@ -203,8 +203,8 @@ int board_mmc_init(bd_t *bis)
 		 * GPG0[2]	SD_0_CDn	-> Not used
 		 * GPG0[3:6]	SD_0_DATA[0:3]
 		 */
-		for (i = S5PC110_GPIO_G00; i < S5PC110_GPIO_G07; i++) {
-			if (i == S5PC110_GPIO_G02)
+		for (i = EXYNOS3110_GPIO_G00; i < EXYNOS3110_GPIO_G07; i++) {
+			if (i == EXYNOS3110_GPIO_G02)
 				continue;
 			/* GPG0[0:6] special function 2 */
 			gpio_cfg_pin(i, 0x2);
@@ -224,7 +224,7 @@ int board_mmc_init(bd_t *bis)
 #endif
 
 #ifdef CONFIG_USB_GADGET
-static int s5pc1xx_phy_control(int on)
+static int exynos3110_phy_control(int on)
 {
 	struct udevice *dev;
 	static int status;
@@ -273,17 +273,17 @@ static int s5pc1xx_phy_control(int on)
 	return 0;
 }
 
-struct dwc2_plat_otg_data s5pc110_otg_data = {
-	.phy_control = s5pc1xx_phy_control,
-	.regs_phy = S5PC110_PHY_BASE,
-	.regs_otg = S5PC110_OTG_BASE,
-	.usb_phy_ctrl = S5PC110_USB_PHY_CONTROL,
+struct dwc2_plat_otg_data exynos3110_otg_data = {
+	.phy_control = exynos3110_phy_control,
+	.regs_phy = EXYNOS3110_USBPHY_BASE,
+	.regs_otg = EXYNOS3110_USBOTG_BASE,
+	.usb_phy_ctrl = EXYNOS3110_USB_PHY_CONTROL,
 };
 
 int board_usb_init(int index, enum usb_init_type init)
 {
 	debug("USB_udc_probe\n");
-	return dwc2_udc_probe(&s5pc110_otg_data);
+	return dwc2_udc_probe(&exynos3110_otg_data);
 }
 #endif
 
@@ -339,10 +339,10 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 
 void setup_onenand_boot(int pressed)
 {
-	if (readl(S5PC110_INFORM5)) {
+	if (readl(EXYNOS3110_INFORM5)) {
 		env_set("boot_mode", "charger");
 		env_set("onenand_load_offset", "0x1980000");
-	} else if (pressed == recovery_keymask || readl(S5PC110_INFORM6)) {
+	} else if (pressed == recovery_keymask || readl(EXYNOS3110_INFORM6)) {
 		env_set("boot_mode", "recovery");
 		env_set("onenand_load_offset", "0x2380000");
 	} else {
@@ -355,7 +355,7 @@ void setup_onenand_boot(int pressed)
 int setup_bootcmd(void)
 {
 	int vol_up, vol_down;
-	int power = S5PC110_GPIO_H26;
+	int power = EXYNOS3110_GPIO_H26;
 	int home = -1;
 	int pressed = 0;
 
@@ -363,17 +363,17 @@ int setup_bootcmd(void)
 		case BOARD_FASCINATE4G:
 		case BOARD_GALAXYS4G:
 		case BOARD_VIBRANT:
-			vol_up = S5PC110_GPIO_H31;
-			vol_down = S5PC110_GPIO_H32;
+			vol_up = EXYNOS3110_GPIO_H31;
+			vol_down = EXYNOS3110_GPIO_H32;
 			break;
 		case BOARD_FASCINATE:
-			vol_up = S5PC110_GPIO_H33;
-			vol_down = S5PC110_GPIO_H31;
+			vol_up = EXYNOS3110_GPIO_H33;
+			vol_down = EXYNOS3110_GPIO_H31;
 			break;
 		default:
-			vol_up = S5PC110_GPIO_H32;
-			vol_down = S5PC110_GPIO_H31;
-			home = S5PC110_GPIO_H35;
+			vol_up = EXYNOS3110_GPIO_H32;
+			vol_down = EXYNOS3110_GPIO_H31;
+			home = EXYNOS3110_GPIO_H35;
 			break;
 	}
 

@@ -224,7 +224,7 @@ static unsigned long exynos3110_get_pll_clk(int pllreg)
 	/* SDIV [2:0] */
 	s = r & 0x7;
 
-	freq = CONFIG_SYS_CLK_FREQ_C110;
+	freq = CONFIG_SYS_CLK_FREQ;
 	if (pllreg == APLL) {
 		if (s < 1)
 			s = 1;
@@ -717,8 +717,10 @@ static unsigned long exynos3110_get_hclk_sys(int dom)
 	unsigned int offset;
 	unsigned int hclk_sys_ratio;
 
-	if (dom == CLK_M)
+#if 0
+	if (dom == EXYNOS3110_CLK_M)
 		return get_hclk();
+#endif
 
 	div = readl(&clk->div0);
 
@@ -757,7 +759,7 @@ static unsigned long get_pclk_sys(int dom)
 
 	pclk_sys_ratio = (div >> offset) & 0x7;
 
-	pclk = get_hclk_sys(dom) / (pclk_sys_ratio + 1);
+	pclk = exynos3110_get_hclk_sys(dom) / (pclk_sys_ratio + 1);
 
 	return pclk;
 }
@@ -765,11 +767,11 @@ static unsigned long get_pclk_sys(int dom)
 /* exynos3110: return peripheral clock frequency */
 static unsigned long exynos3110_get_pclk(void)
 {
-	return get_pclk_sys(CLK_P);
+	return get_pclk_sys(EXYNOS3110_CLK_P);
 }
 
 /* exynos3110: return pwm clock frequency */
-static unsigned long exynos3110_get_uart_clk(int dev_index)
+static unsigned long exynos3110_get_pwm_clk(void)
 {
 	return exynos3110_get_pclk();
 }
@@ -1803,6 +1805,8 @@ unsigned long get_pll_clk(int pllreg)
 		if (proid_is_exynos4412())
 			return exynos4x12_get_pll_clk(pllreg);
 		return exynos4_get_pll_clk(pllreg);
+	} else if (cpu_is_exynos3()) {
+		return exynos3110_get_pll_clk(pllreg);
 	}
 
 	return 0;

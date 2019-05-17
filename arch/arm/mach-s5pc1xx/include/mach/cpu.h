@@ -62,8 +62,6 @@ static inline unsigned int samsung_get_base_##device(void)	\
 {								\
 	if (cpu_is_s5pc100())					\
 		return S5PC100_##base;				\
-	else if (cpu_is_s5pc110())				\
-		return S5PC110_##base;				\
 	else							\
 		return 0;					\
 }

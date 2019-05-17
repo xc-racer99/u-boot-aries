@@ -3,7 +3,7 @@ Summary
 =======
 
 This README is about U-Boot support for SAMSUNG's ARM Cortex-A8 based S5PC1xx
-family of SoCs (S5PC100 [1] and S5PC110).
+family of SoCs (S5PC100 [1]).
 
 Currently the following board is supported:
 
@@ -34,11 +34,6 @@ To check SoC:
 
 	if (cpu_is_s5pc100())
 		printf("cpu is s5pc100\n");
-
-	or
-
-	if (cpu_is_s5pc110())
-		printf("cpu is s5pc110\n");
 
 gpio
 

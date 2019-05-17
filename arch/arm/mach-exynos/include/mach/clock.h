@@ -8,6 +8,58 @@
 #define __ASM_ARM_ARCH_CLOCK_H_
 
 #ifndef __ASSEMBLY__
+
+#define EXYNOS3110_CLK_M	0
+#define EXYNOS3110_CLK_D	1
+#define EXYNOS3110_CLK_P	2
+
+struct exynos3110_clock {
+	unsigned int	apll_lock;
+	unsigned char	res1[0x4];
+	unsigned int	mpll_lock;
+	unsigned char	res2[0x4];
+	unsigned int	epll_lock;
+	unsigned char	res3[0xc];
+	unsigned int	vpll_lock;
+	unsigned char	res4[0xdc];
+	unsigned int	apll_con;
+	unsigned char	res5[0x4];
+	unsigned int	mpll_con;
+	unsigned char	res6[0x4];
+	unsigned int	epll_con;
+	unsigned char	res7[0xc];
+	unsigned int	vpll_con;
+	unsigned char	res8[0xdc];
+	unsigned int	src0;
+	unsigned int	src1;
+	unsigned int	src2;
+	unsigned int	src3;
+	unsigned int	src4;
+	unsigned int	src5;
+	unsigned int	src6;
+	unsigned char	res9[0x64];
+	unsigned int	src_mask0;
+	unsigned int	src_mask1;
+	unsigned char	res10[0x78];
+	unsigned int	div0;
+	unsigned int	div1;
+	unsigned int	div2;
+	unsigned int	div3;
+	unsigned int	div4;
+	unsigned int	div5;
+	unsigned int	div6;
+	unsigned int	div7;
+	unsigned char	res11[0x140];
+	unsigned int	gate_ip0;
+	unsigned int	gate_ip1;
+	unsigned int	gate_ip2;
+	unsigned int	gate_ip3;
+	unsigned int	gate_ip4;
+	unsigned char	res12[0xc];
+	unsigned int	gate_block;
+	unsigned int	gate_ip5;
+};
+
 struct exynos4_clock {
 	unsigned char	res1[0x4200];
 	unsigned int	src_leftbus;
