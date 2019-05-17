@@ -70,7 +70,7 @@ int board_init(void)
 	return 0;
 }
 
-int exynos_power_init(void)
+int power_init_board(void)
 {
 	int val, ret, reg;
 	struct udevice *dev;
