@@ -626,7 +626,7 @@ static int exynos_fb_probe(struct udevice *dev)
 	struct video_priv *uc_priv = dev_get_uclass_priv(dev);
 	struct exynos_fb_priv *priv = dev_get_priv(dev);
 	struct udevice *panel;
-#ifndef CONFIG_ARCH_S5PC1XX
+#if 0
 	struct udevice *dp, *bridge;
 #endif
 	int ret;
@@ -650,7 +650,7 @@ static int exynos_fb_probe(struct udevice *dev)
 		return -ENODEV;
 	}
 
-#ifndef CONFIG_ARCH_S5PC1XX
+#if 0
 	ret = uclass_first_device(UCLASS_DISPLAY, &dp);
 	if (ret) {
 		debug("%s: Display device error %d\n", __func__, ret);
@@ -674,7 +674,7 @@ static int exynos_fb_probe(struct udevice *dev)
 		return ret;
 	}
 
-#ifndef CONFIG_ARCH_S5PC1XX
+#if 0
 	ret = uclass_get_device(UCLASS_VIDEO_BRIDGE, 0, &bridge);
 	if (!ret)
 		ret = video_bridge_set_backlight(bridge, 80);
