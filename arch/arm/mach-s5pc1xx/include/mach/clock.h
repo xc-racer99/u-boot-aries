@@ -84,6 +84,11 @@ struct s5pc110_clock {
 	unsigned char	res12[0xc];
 	unsigned int	gate_block;
 	unsigned int	gate_ip5;
+	unsigned char	res13[0xafc];
+	unsigned int	clk_out;
+	unsigned char	res14[0xf8];
+	unsigned int	div_stat0;
+	unsigned int	div_stat1;
 };
 #endif
 

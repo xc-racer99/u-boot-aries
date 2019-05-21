@@ -371,6 +371,14 @@ static void s5pc110_set_lcd_clk(void)
 {
 	struct s5pc110_clock *clk =
 		(struct s5pc110_clock *)samsung_get_base_clock();
+	int i;
+
+	/*
+	 * CLK_SRC_MASK0
+	 * SCLK_FIMD [5]
+	 * MUX off
+	 */
+	clrsetbits_le32(&clk->src_mask0, 1 << 5, 0);
 
 	/*
 	 * CLK_SRC1
@@ -378,12 +386,6 @@ static void s5pc110_set_lcd_clk(void)
 	 * set parent to MPLL
 	 */
 	clrsetbits_le32(&clk->src1, 0xf << 20, 0x6 << 20);
-
-	/*
-	 * CLK_SRC_MASK0
-	 * SCLK_FIMD [5]
-	 */
-	setbits_le32(&clk->src_mask0, 1 << 5);
 
 	/*
 	 * CLK_DIV1
@@ -394,10 +396,35 @@ static void s5pc110_set_lcd_clk(void)
 
 	/*
 	 * CLK_GATE_IP1
-	 * CLK_FIMD[0]
+	 * CLK_FIMD [0]
 	 * enable FIMD clock
 	 */
 	setbits_le32(&clk->gate_ip1, 1 << 0);
+
+	/*
+	 * CLK_GATE_BLOCK
+	 * CLK_LCD [3]
+	 * enable LCD block
+	 */
+	setbits_le32(&clk->gate_ip1, 1 << 3);
+
+	/*
+	 * CLK_SRC_MASK0
+	 * SCLK_FIMD [5]
+	 * MUX on
+	 */
+	setbits_le32(&clk->src_mask0, 1 << 5);
+
+	/*
+	 * CLK_DIV_STAT0
+	 * DIV_FIMD [13]
+	 * wait for stable divider
+	 */
+	i = 10000;
+	do {
+		if(i-- == 0)
+			break;
+	} while (readl(&clk->div_stat0) & (0x1 << 13));
 }
 
 void set_lcd_clk(void)
