@@ -241,8 +241,11 @@
 		samsung,vl-hfpd = <16>;
 		samsung,vl-hbpd = <16>;
 		samsung,vl-vspw = <2>;
-		samsung,vl-vfpd =  <28>;
+		samsung,vl-vfpd = <28>;
 		samsung,vl-vbpd = <1>;
+
+		samsung,interface-mode = <1>;
+		samsung,winid = <3>;
 
 		u-boot,dm-pre-reloc;
 	};
