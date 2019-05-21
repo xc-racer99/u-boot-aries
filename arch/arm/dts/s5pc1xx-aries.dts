@@ -223,8 +223,6 @@
 			compatible = "samsung,s6e63m0";
 			reg = <0>;
 			spi-max-frequency = <1200000>;
-			spi-cpol;
-			spi-cpha;
 			reset-gpios = <&gpmp05 5 1>;
 		};
 	};
@@ -245,7 +243,7 @@
 		samsung,vl-vbpd = <1>;
 
 		samsung,interface-mode = <1>;
-		samsung,winid = <3>;
+		samsung,winid = <2>;
 
 		u-boot,dm-pre-reloc;
 	};
