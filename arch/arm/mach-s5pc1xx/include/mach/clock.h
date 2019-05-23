@@ -90,6 +90,11 @@ struct s5pc110_clock {
 	unsigned int	div_stat0;
 	unsigned int	div_stat1;
 };
+
+/*
+ * Initialize clock for the device
+ */
+void system_clock_init(void);
 #endif
 
 #endif

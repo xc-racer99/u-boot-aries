@@ -1,8 +1,10 @@
 #include <common.h>
 #include <config.h>
+#include <asm/io.h>
+#include <asm/arch/power.h>
 #include <onenand_uboot.h>
 
-#include <mach/power.h>
+#include "common_setup.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -31,21 +33,15 @@ static void setup_global_data(gd_t *gdp)
 	gd->have_console = 1;
 }
 
-extern void do_lowlevel_init(void);
-
 void board_init_f(unsigned long bootflag)
 {
-	unsigned int reg;
 	__aligned(8) gd_t local_gd;
 	__attribute__((noreturn)) void (*uboot)(void);
 
 	setup_global_data(&local_gd);
 
-	reg = readl(S5PC110_PS_HOLD_CTRL);
-	reg |= 0x301;
-	writel(reg, S5PC110_PS_HOLD_CTRL);
-
-	do_lowlevel_init();
+	if (do_lowlevel_init())
+		power_exit_wakeup();
 
 	/* Load u-boot */
 	onenand_spl_load_image(CONFIG_SYS_ONENAND_U_BOOT_OFFS,
