@@ -91,12 +91,29 @@ static void s5p_gpio_set_value(struct s5p_gpio_bank *bank, int gpio, int en)
 	writel(value, &bank->dat);
 }
 
+static unsigned int s5p_gpio_get_value(struct s5p_gpio_bank *bank, int gpio)
+{
+	unsigned int value;
+
+	value = readl(&bank->dat);
+	return !!(value & DAT_MASK(gpio));
+}
+
 #ifdef CONFIG_SPL_BUILD
 /* Common GPIO API - SPL does not support driver model yet */
 int gpio_set_value(unsigned gpio, int value)
 {
 	s5p_gpio_set_value(s5p_gpio_get_bank(gpio),
 			   s5p_gpio_get_pin(gpio), value);
+
+	return 0;
+}
+
+/* Common GPIO API - SPL does not support driver model yet */
+int gpio_get_value(unsigned gpio)
+{
+	s5p_gpio_get_value(s5p_gpio_get_bank(gpio),
+			   s5p_gpio_get_pin(gpio));
 
 	return 0;
 }
@@ -108,14 +125,6 @@ static int s5p_gpio_get_cfg_pin(struct s5p_gpio_bank *bank, int gpio)
 	value = readl(&bank->con);
 	value &= CON_MASK(gpio);
 	return CON_SFR_UNSHIFT(value, gpio);
-}
-
-static unsigned int s5p_gpio_get_value(struct s5p_gpio_bank *bank, int gpio)
-{
-	unsigned int value;
-
-	value = readl(&bank->dat);
-	return !!(value & DAT_MASK(gpio));
 }
 #endif /* CONFIG_SPL_BUILD */
 
