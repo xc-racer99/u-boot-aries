@@ -7,7 +7,7 @@
 # Guennadi Liakhovetki, DENX Software Engineering, <lg@denx.de>
 
 ifdef CONFIG_SPL_BUILD
-obj-	= dummy.o
+obj-y	= spl_build.o
 hostprogs-y := tools/mkariesspl
 always := $(hostprogs-y)
 else
