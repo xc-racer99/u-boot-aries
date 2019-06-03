@@ -413,17 +413,10 @@ int board_late_init(void)
 	uint64_t board_serial = 0;
 	char board_serial_str[17];
 
-	/* Base the serial number on the MMC card or SD if on variant without it */
+	/* Base the serial number on values in PRO_ID + 0x14/0x18 */
 	if (!env_get("serial#")) {
-		struct mmc *mmc = find_mmc_device(1);
-		if (!mmc)
-			mmc = find_mmc_device(0);
-		if (!mmc)
-			pr_err("%s: couldn't get serial number - no MMC device found!\n", __func__);
-		else if (mmc_init(mmc))
-			pr_err("%s: MMC init failed!\n", __func__);
-		else
-			board_serial = ((uint64_t)mmc->cid[2] << 32) | mmc->cid[3];
+		board_serial = (uint64_t) readl(samsung_get_base_clock() + 0x18) << 32
+				| readl(samsung_get_base_clock() + 0x14);
 
 		sprintf(board_serial_str, "%016llx", board_serial);
 		env_set("serial#", board_serial_str);
