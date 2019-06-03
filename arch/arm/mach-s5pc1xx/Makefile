@@ -7,6 +7,7 @@
 # Guennadi Liakhovetki, DENX Software Engineering, <lg@denx.de>
 
 obj-y	= cache.o
+obj-y	+= clock.o
 
 ifdef CONFIG_SPL_BUILD
 obj-y	+= clock_init.o
@@ -18,6 +19,5 @@ obj-y	+= tzpc.o
 else
 obj-y	+= reset.o
 
-obj-y	+= clock.o
 obj-y	+= system.o
 endif

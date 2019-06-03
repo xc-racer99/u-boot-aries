@@ -42,8 +42,16 @@ int do_lowlevel_init(void)
 
 	misc_power_init();
 
+#if 1
+	uart_init();
+	debug_uart_init();
+
+	for (reset_status = 0; reset_status < 10; reset_status++)
+		debug_uart_putc('Y');
+#else
 	if (actions & DO_UART)
 		uart_init();
+#endif
 
 	if (actions & DO_CLOCKS) {
 		system_clock_init();

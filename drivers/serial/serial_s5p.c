@@ -237,5 +237,33 @@ static inline void _debug_uart_putc(int ch)
 }
 
 DEBUG_UART_FUNCS
+#elif defined(CONFIG_SPL_BUILD)
 
+#define CONFIG_DEBUG_UART_BASE 0xe2900800
+
+void hang(void)
+{
+	while (true) ;
+}
+
+void debug_uart_init(void)
+{
+	struct s5p_uart *uart = (struct s5p_uart *)CONFIG_DEBUG_UART_BASE;
+	u32 uclk;
+
+	uclk = get_uart_clk(2);
+
+	s5p_serial_init(uart);
+
+	s5p_serial_baud(uart, uclk, CONFIG_BAUDRATE);
+}
+
+void debug_uart_putc(int ch)
+{
+	struct s5p_uart *uart = (struct s5p_uart *)CONFIG_DEBUG_UART_BASE;
+
+	while (readl(&uart->ufstat) & TX_FIFO_FULL);
+
+	writeb(ch, &uart->utxh);
+}
 #endif

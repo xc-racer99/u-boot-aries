@@ -43,7 +43,9 @@ static unsigned long s5pc100_get_pll_clk(int pllreg)
 		r = readl(&clk->hpll_con);
 		break;
 	default:
+#ifndef CONFIG_SPL_BUILD
 		printf("Unsupported PLL (%d)\n", pllreg);
+#endif
 		return 0;
 	}
 
@@ -94,7 +96,9 @@ static unsigned long s5pc110_get_pll_clk(int pllreg)
 		r = readl(&clk->vpll_con);
 		break;
 	default:
+#ifndef CONFIG_SPL_BUILD
 		printf("Unsupported PLL (%d)\n", pllreg);
+#endif
 		return 0;
 	}
 

@@ -19,10 +19,7 @@
 #include <asm/arch/cpu.h>		/* get chip and board defs */
 
 #define CONFIG_ARCH_CPU_INIT
-
-#ifdef CONFIG_SPL_BUILD
-#define CONFIG_SKIP_LOWLEVEL_INIT_ONLY
-#endif
+#define CONFIG_SKIP_LOWLEVEL_INIT
 
 /* Disable L2 cache - enabling causes slowdowns of ~50% in Linux */
 #define CONFIG_SYS_L2CACHE_OFF
@@ -109,7 +106,7 @@
 		"|| load mmc ${mmcdev}:${mmcpart} ${fdt_load_addr} /boot/${fdtfile};\0" \
 	"setup_kernel_args=" \
 		"setenv bootargs root=/dev/mmcblk${rootdev}p${mmcpart}" \
-		" rootwait rw ${console} ${meminfo} ${opts} ${mtdparts} ubi.mtd=ubi no_console_suspend initcall_debug;\0" \
+		" rootwait rw ${console} ${meminfo} ${opts} ${mtdparts} ubi.mtd=ubi no_console_suspend;\0" \
 	"sddev=1\0" \
 	"rootdev=1\0" \
 	"uboot_update=if test -e mmc 0:1 u-boot.bin; then "\
