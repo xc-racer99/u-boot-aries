@@ -306,15 +306,9 @@ int misc_init_r(void)
 	switch (cur_board) {
 		case BOARD_FASCINATE4G:
 		case BOARD_GALAXYS4G:
-			/* Hide MMC entries */
-			env_set(MMC_BOOTMENU1, NULL);
-			env_set(MMC_BOOTMENU2, NULL);
-			env_set(MMC_BOOTMENU3, NULL);
-			env_set("sddev", "1");
 			env_set("mtdparts", "mtdparts=b0600000.onenand:256k@25856k(uboot-env),10240k(boot),10240k(recovery),980480k(ubi)");
 			break;
 		default:
-			env_set("sddev", "2");
 			env_set("mtdparts", "mtdparts=b0600000.onenand:256k@25856k(uboot-env),10240k(boot),10240k(recovery),466432k(ubi)");
 			break;
 	}
@@ -341,19 +335,18 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 	return 0;
 }
 
-void setup_onenand_boot(int pressed)
+void setup_android_options(int pressed)
 {
 	if (readl(S5PC110_INFORM5)) {
 		env_set("boot_mode", "charger");
 		env_set("onenand_load_offset", "0x1980000");
-	} else if (pressed == recovery_keymask || readl(S5PC110_INFORM6)) {
+	} else if (pressed & recovery_keymask || readl(S5PC110_INFORM6)) {
 		env_set("boot_mode", "recovery");
 		env_set("onenand_load_offset", "0x2380000");
 	} else {
 		env_set("boot_mode", "normal");
 		env_set("onenand_load_offset", "0x1980000");
 	}
-	env_set("bootcmd", "run onenand_boot;");
 }
 
 int setup_bootcmd(void)
@@ -361,10 +354,15 @@ int setup_bootcmd(void)
 	int vol_up, vol_down;
 	int home = -1;
 	int pressed = 0;
+	int num_mmc = 2;
+	unsigned int i = 0;
+	char bootmenu_entry[14];
 
 	switch (cur_board) {
 		case BOARD_FASCINATE4G:
 		case BOARD_GALAXYS4G:
+			num_mmc = 1;
+			/* fall through */
 		case BOARD_VIBRANT:
 			vol_up = S5PC110_GPIO_H31;
 			vol_down = S5PC110_GPIO_H32;
@@ -395,15 +393,60 @@ int setup_bootcmd(void)
 	if (home > 0 && gpio_get_value(home) == 0)
 		pressed |= KEY_HOME;
 
-	if (pressed == bootmenu_keymask) {
-		env_set("bootcmd", "sleep 1; bootmenu 20;");
+	/* set variables that Android might need */
+	setup_android_options(pressed);
+
+	/* if we don't want a menu, use the last bootcmd */
+	if (!(pressed & bootmenu_keymask) && env_get("prev_cmd")) {
+		env_set("bootcmd", env_get("prev_cmd"));
 		return 0;
 	}
 
-	if (strcmp(env_get("default_boot_mode"), "mmc") == 0)
-		env_set("bootcmd", "run mmcboot;");
-	else
-		setup_onenand_boot(pressed);
+	env_set("bootcmd", "sleep 1; bootmenu 20;");
+
+	/* add standard bootmenu entries */
+	sprintf(bootmenu_entry, "bootmenu_%d", i++);
+	env_set(bootmenu_entry,
+			"Fastboot=ubi part ubi; fastboot usb 0; bootd;");
+
+	sprintf(bootmenu_entry, "bootmenu_%d", i++);
+	env_set(bootmenu_entry, env_get("onenand_android_boot"));
+
+	if (num_mmc == 2) {
+		sprintf(bootmenu_entry, "bootmenu_%d", i++);
+		env_set(bootmenu_entry, "MMC Boot=if test \"${prev_cmd}\" !="
+			" \"run bootcmd_mmc1\";"
+			" then setenv prev_cmd run bootcmd_mmc1;"
+			" saveenv; fi; run bootcmd_mmc1;");
+	}
+
+	sprintf(bootmenu_entry, "bootmenu_%d", i++);
+	env_set(bootmenu_entry, "SD Card Boot=if test \"${prev_cmd}\" !="
+		" \"run bootcmd_mmc0\"; "
+		" then setenv prev_cmd run bootcmd_mmc0;"
+		" saveenv; fi; run bootcmd_mmc0;");
+
+	sprintf(bootmenu_entry, "bootmenu_%d", i++);
+	env_set(bootmenu_entry, "UBI Boot=if test \"${prev_cmd}\" != "
+			" \"run bootcmd_ubifs0\"; "
+			" then setenv prev_cmd run bootcmd_ubifs0;"
+			" saveenv; fi; run bootcmd_ubifs0;");
+
+	if (num_mmc == 2) {
+		sprintf(bootmenu_entry, "bootmenu_%d", i++);
+		env_set(bootmenu_entry, "MMC - Mass Storage=ums 0 mmc 1;");
+	}
+
+	sprintf(bootmenu_entry, "bootmenu_%d", i++);
+	env_set(bootmenu_entry, "SD Card - Mass Storage=ums 0 mmc 0;");
+
+	sprintf(bootmenu_entry, "bootmenu_%d", i++);
+	env_set(bootmenu_entry,
+		"Update u-boot.bin from SD=run uboot_update; sleep 5; bootd;");
+
+	/* terminate bootmenu entries, in case of residual configs */
+	sprintf(bootmenu_entry, "bootmenu_%d", i++);
+	env_set(bootmenu_entry, NULL);
 
 	return 0;
 }

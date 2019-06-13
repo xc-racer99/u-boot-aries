@@ -72,13 +72,25 @@
 
 #define CONFIG_MISC_COMMON
 
+#ifndef CONFIG_SPL_BUILD
+#define BOOT_TARGET_DEVICES(func) \
+	func(MMC, mmc, 0) \
+	func(MMC, mmc, 1) \
+	func(UBIFS, ubifs, 0)
+#include <config_distro_bootcmd.h>
+#else
+#define BOOTENV
+#endif
+
 #define CONFIG_ENV_OVERWRITE
 #define CONFIG_EXTRA_ENV_SETTINGS					\
-	"boottrace=setenv opts initcall_debug; run bootcmd\0" \
-	"bootchart=set opts init=/sbin/bootchartd; run bootcmd\0" \
+	BOOTENV \
 	"console=" CONFIG_DEFAULT_CONSOLE "\0"\
-	"kernel_load_addr=0x32000000\0" \
-	"fdt_load_addr=0x33000000\0" \
+	"kernel_addr_r=0x32000000\0" \
+	"fdt_addr_r=0x33000000\0" \
+	"scriptaddr=0x34000000\0" \
+	"ramdisk_addr_r=0x40000000\0" \
+	"bootubipart=ubi\0" \
 	"uboot_load_addr=0x33000000\0" \
 	"uboot_onenand_off=0x1200000\0" \
 	"uboot_onenand_size="__stringify(CONFIG_BOARD_SIZE_LIMIT)"\0" \
@@ -86,24 +98,7 @@
 	"stdin=serial,gpio-keys\0" \
 	"stdout=serial,vidconsole\0" \
 	"stderr=serial,vidconsole\0" \
-	"opts=ignore_loglevel earlyprintk\0" \
-	"check_dtb=" \
-		"if run loaddtb; then " \
-			"setenv fdt_addr ${fdt_load_addr};" \
-		"else " \
-			"setenv fdt_addr;" \
-		"fi;\0" \
-	"loadkernel=" \
-		"load mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} uImage "\
-		"|| load mmc ${mmcdev}:${mmcpart} ${kernel_load_addr} /boot/uImage;\0" \
-	"loaddtb=" \
-		"load mmc ${mmcdev}:${mmcpart} ${fdt_load_addr} ${fdtfile} "\
-		"|| load mmc ${mmcdev}:${mmcpart} ${fdt_load_addr} /boot/${fdtfile};\0" \
-	"setup_kernel_args=" \
-		"setenv bootargs root=/dev/mmcblk${rootdev}p${mmcpart}" \
-		" rootwait rw ${console} ${meminfo} ${opts} ${mtdparts} ubi.mtd=ubi;\0" \
-	"sddev=1\0" \
-	"rootdev=1\0" \
+	"bootargs=console=${console} ${mtdparts} ubi.mtd=ubi;\0" \
 	"uboot_update=if test -e mmc 0:1 u-boot.bin; then "\
 		"load mmc 0:1 ${uboot_load_addr} u-boot.bin; "\
 		"if onenand checkbad ${uboot_onenand_off} ${uboot_onenand_size}; "\
@@ -112,39 +107,11 @@
 			"else echo OneNAND contains bad blocks, must use Odin/Heimdall; " \
 		"fi;" \
 		"else echo u-boot.bin not present, not updating; fi;\0" \
-	"mmcdev=0\0" \
-	"mmcpart=1\0" \
-	"mmcboot="\
-		"run check_dtb;" \
-		"run loadkernel;" \
-		"run setup_kernel_args;" \
-		"bootm ${kernel_load_addr} - ${fdt_addr}\0"\
-	"onenand_boot=" \
-		"if test ${default_boot_mode} != onenand ; then " \
-			"setenv default_boot_mode onenand;" \
-			"saveenv;" \
-		"fi;" \
-		"setenv bootargs ${mtdparts} ubi.mtd=ubi androidboot.mode=${boot_mode} androidboot.serialno=${serial#};" \
-		"onenand read ${kernel_load_addr} ${onenand_load_offset} 0xA00000;" \
-		"bootm ${kernel_load_addr};\0" \
-	"bootmenu_0=Fastboot=ubi part ubi; fastboot usb 0; bootd;\0" \
-	"bootmenu_1=Update U-Boot from SD Card Partition 1=run uboot_update; sleep 5; bootd;\0" \
-	"bootmenu_2=OneNAND Main Boot=setenv boot_mode normal; setenv onenand_load_offset 0x1980000; run onenand_boot;\0" \
-	"bootmenu_3=OneNAND Recovery Boot=setenv boot_mode recovery; setenv onenand_load_offset 0x2380000; run onenand_boot;\0" \
-	"bootmenu_4=SD Card Partition 1 Boot=setenv mmcdev 0; setenv mmcpart 1; setenv rootdev ${sddev};" \
-			"setenv default_boot_mode mmc; saveenv; run mmcboot;\0" \
-	"bootmenu_5=SD Card Partition 2 Boot=setenv mmcdev 0; setenv mmcpart 2; setenv rootdev ${sddev};" \
-			"setenv default_boot_mode mmc; saveenv; run mmcboot;\0" \
-	"bootmenu_6=SD Card - Mass Storage=ums 0 mmc 0;\0" \
-	"bootmenu_7=MMC Partition 1 Boot=setenv mmcdev 1; setenv mmcpart 1; setenv rootdev 0;" \
-			"setenv default_boot_mode mmc; saveenv; run mmcboot;\0" \
-	"bootmenu_8=MMC Partition 2 Boot=setenv mmcdev 1; setenv mmcpart 2; setenv rootdev 0;" \
-			"setenv default_boot_mode mmc; saveenv; run mmcboot;\0" \
-	"bootmenu_9=MMC - Mass Storage=ums 0 mmc 1;\0"
-
-#define MMC_BOOTMENU1	"bootmenu_7"
-#define MMC_BOOTMENU2	"bootmenu_8"
-#define MMC_BOOTMENU3	"bootmenu_9"
+	"do_onenand_android_boot=setenv bootargs ${mtdparts} ubi.mtd=ubi androidboot.mode=${boot_mode} androidboot.serialno=${serial#}; "\
+		"onenand read ${kernel_addr_r} ${onenand_load_offset} 0xa00000; bootm ${kernel_addr_r};\0" \
+	"onenand_android_boot=Android Boot=if test \"${prev_cmd}\" != \"${do_onenand_android_boot}\"; " \
+		"then setenv prev_cmd ${do_onenand_android_boot}; saveenv; fi; " \
+		"run do_onenand_android_boot;\0"
 
 #define CONFIG_SYS_PBSIZE	384	/* Print Buffer Size */
 /* memtest works on */
