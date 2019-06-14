@@ -13,13 +13,14 @@
 
 /* maximum bootmenu entries */
 #define MAX_COUNT	99
+#define MAX_PREFIX_LEN	15
 
 /* maximal size of bootmenu env
- *  9 = strlen("bootmenu_")
+ *  MAX_PREFIX_LEN
  *  2 = strlen(MAX_COUNT)
  *  1 = NULL term
  */
-#define MAX_ENV_SIZE	(9 + 2 + 1)
+#define MAX_ENV_SIZE	(MAX_PREFIX_LEN + 2 + 1)
 
 struct bootmenu_entry {
 	unsigned short int num;		/* unique number 0 .. MAX_COUNT */
@@ -44,14 +45,18 @@ enum bootmenu_key {
 	KEY_SELECT,
 };
 
-static char *bootmenu_getoption(unsigned short int n)
+static char *bootmenu_getoption(unsigned short int n, const char *prefix)
 {
 	char name[MAX_ENV_SIZE];
 
 	if (n > MAX_COUNT)
 		return NULL;
 
-	sprintf(name, "bootmenu_%d", n);
+	if (prefix != NULL)
+		sprintf(name, "%s%d", prefix, n);
+	else
+		sprintf(name, "bootmenu_%d", n);
+
 	return env_get(name);
 }
 
@@ -247,7 +252,7 @@ static void bootmenu_destroy(struct bootmenu_data *menu)
 	free(menu);
 }
 
-static struct bootmenu_data *bootmenu_create(int delay)
+static struct bootmenu_data *bootmenu_create(int delay, const char *prefix)
 {
 	unsigned short int i = 0;
 	const char *option;
@@ -266,7 +271,7 @@ static struct bootmenu_data *bootmenu_create(int delay)
 	menu->active = 0;
 	menu->first = NULL;
 
-	while ((option = bootmenu_getoption(i))) {
+	while ((option = bootmenu_getoption(i, prefix))) {
 		sep = strchr(option, '=');
 		if (!sep) {
 			printf("Invalid bootmenu entry: %s\n", option);
@@ -356,7 +361,7 @@ cleanup:
 	return NULL;
 }
 
-static void bootmenu_show(int delay)
+static void bootmenu_show(int delay, const char *prefix)
 {
 	int init = 0;
 	void *choice = NULL;
@@ -369,7 +374,7 @@ static void bootmenu_show(int delay)
 
 	/* If delay is 0 do not create menu, just run first entry */
 	if (delay == 0) {
-		option = bootmenu_getoption(0);
+		option = bootmenu_getoption(0, prefix);
 		if (!option) {
 			puts("bootmenu option 0 was not found\n");
 			return;
@@ -383,7 +388,7 @@ static void bootmenu_show(int delay)
 		return;
 	}
 
-	bootmenu = bootmenu_create(delay);
+	bootmenu = bootmenu_create(delay, prefix);
 	if (!bootmenu)
 		return;
 
@@ -467,7 +472,7 @@ void menu_display_statusline(struct menu *m)
 #ifdef CONFIG_MENU_SHOW
 int menu_show(int bootdelay)
 {
-	bootmenu_show(bootdelay);
+	bootmenu_show(bootdelay, NULL);
 	return -1; /* -1 - abort boot and run monitor code */
 }
 #endif
@@ -475,6 +480,7 @@ int menu_show(int bootdelay)
 int do_bootmenu(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 {
 	char *delay_str = NULL;
+	char *prefix = NULL;
 	int delay = 10;
 
 #if defined(CONFIG_BOOTDELAY) && (CONFIG_BOOTDELAY >= 0)
@@ -484,19 +490,29 @@ int do_bootmenu(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 	if (argc >= 2)
 		delay_str = argv[1];
 
+	if (argc >= 3) {
+		if (strlen(argv[2]) > MAX_PREFIX_LEN) {
+			pr_err("bootmenu: prefix %s is too long\n", argv[2]);
+			return 1;
+		}
+		prefix = argv[2];
+	}
+
 	if (!delay_str)
 		delay_str = env_get("bootmenu_delay");
 
 	if (delay_str)
 		delay = (int)simple_strtol(delay_str, NULL, 10);
 
-	bootmenu_show(delay);
+	bootmenu_show(delay, prefix);
 	return 0;
 }
 
 U_BOOT_CMD(
-	bootmenu, 2, 1, do_bootmenu,
+	bootmenu, 3, 1, do_bootmenu,
 	"ANSI terminal bootmenu",
 	"[delay]\n"
 	"    - show ANSI terminal bootmenu with autoboot delay"
+	"[prefix]\n"
+	"    - what the base prefix should be, default bootmenu_"
 );
