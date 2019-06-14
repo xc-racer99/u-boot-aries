@@ -20,6 +20,9 @@
 
 #define MAX_TFTP_PATH_LEN 127
 
+/* strlen("pxemenu_") + strlen(MAX_ENTRIES/99) + NUL */
+#define MAX_ENTRY_LEN	(8 + 2 + 1)
+
 const char *pxe_default_paths[] = {
 #ifdef CONFIG_SYS_SOC
 	"default-" CONFIG_SYS_ARCH "-" CONFIG_SYS_SOC,
@@ -1437,6 +1440,7 @@ static struct pxe_menu *parse_pxefile(cmd_tbl_t *cmdtp, unsigned long menucfg)
 	return cfg;
 }
 
+#ifndef CONFIG_CMD_BOOTMENU
 /*
  * Converts a pxe_menu struct into a menu struct for use with U-Boot's generic
  * menu code.
@@ -1491,6 +1495,7 @@ static struct menu *pxe_menu_to_menu(struct pxe_menu *cfg)
 
 	return m;
 }
+#endif
 
 /*
  * Try to boot any labels we have yet to attempt to boot.
@@ -1508,6 +1513,7 @@ static void boot_unattempted_labels(cmd_tbl_t *cmdtp, struct pxe_menu *cfg)
 	}
 }
 
+#ifndef CONFIG_CMD_BOOTMENU
 /*
  * Boot the system as prescribed by a pxe_menu.
  *
@@ -1556,6 +1562,56 @@ static void handle_pxe_menu(cmd_tbl_t *cmdtp, struct pxe_menu *cfg)
 	boot_unattempted_labels(cmdtp, cfg);
 }
 
+#else
+
+static void pxe_menu_to_bootmenu(cmd_tbl_t *cmdtp, struct pxe_menu *cfg)
+{
+	struct list_head *pos;
+	struct pxe_label *label;
+	char entry[MAX_ENTRY_LEN];
+	char bootmenu_cmd[25];
+	char *selected;
+	int err, i = 0;
+
+	list_for_each(pos, &cfg->labels) {
+		char *cmd;
+
+		label = list_entry(pos, struct pxe_label, list);
+		cmd = malloc(28 + 2 * strlen(label->name));
+		if (!cmd)
+			return;
+
+		sprintf(entry, "pxemenu_%d", i++);
+		sprintf(cmd, "%s=setenv pxe_bootmenu_label %s",
+			label->name, label->name);
+		env_set(entry, cmd);
+
+		free(cmd);
+	}
+
+	/* run the bootmenu */
+	sprintf(bootmenu_cmd, "bootmenu %d pxemenu_",
+		DIV_ROUND_UP(cfg->timeout, 10));
+	run_command(bootmenu_cmd, 0);
+
+	selected = env_get("pxe_bootmenu_label");
+
+	list_for_each(pos, &cfg->labels) {
+		label = list_entry(pos, struct pxe_label, list);
+
+		if (strcmp(label->name, selected) != 0)
+			continue;
+
+		err = label_boot(cmdtp, label);
+		if (!err)
+			return;
+		break;
+	}
+
+	boot_unattempted_labels(cmdtp, cfg);
+}
+#endif
+
 #ifdef CONFIG_CMD_NET
 /*
  * Boots a system using a pxe file
@@ -1594,7 +1650,11 @@ do_pxe_boot(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		return 1;
 	}
 
+#ifdef CONFIG_CMD_BOOTMENU
+	pxe_menu_to_bootmenu(cmdtp, cfg);
+#else
 	handle_pxe_menu(cmdtp, cfg);
+#endif
 
 	destroy_pxe_menu(cfg);
 
@@ -1709,7 +1769,11 @@ static int do_sysboot(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	if (prompt)
 		cfg->prompt = 1;
 
+#ifdef CONFIG_CMD_BOOTMENU
+	pxe_menu_to_bootmenu(cmdtp, cfg);
+#else
 	handle_pxe_menu(cmdtp, cfg);
+#endif
 
 	destroy_pxe_menu(cfg);
 
