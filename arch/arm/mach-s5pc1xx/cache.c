@@ -9,7 +9,7 @@
 
 #include <common.h>
 
-#ifndef CONFIG_SYS_DCACHE_OFF
+#if defined(CONFIG_SPL_BUILD) || !defined(CONFIG_SYS_DCACHE_OFF)
 void enable_caches(void)
 {
 	dcache_enable();
@@ -21,7 +21,7 @@ void disable_caches(void)
 }
 #endif
 
-#ifndef CONFIG_SYS_L2CACHE_OFF
+#if defined(CONFIG_SPL_BUILD) || !defined(CONFIG_SYS_L2CACHE_OFF)
 void v7_outer_cache_enable(void)
 {
 	__asm(
