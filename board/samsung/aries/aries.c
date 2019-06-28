@@ -59,6 +59,11 @@ u32 get_board_rev(void)
 	return hwrev;
 }
 
+/*
+ * This is only needed when not using the SPL
+ * but as there is the option to use the stock
+ * SBL it should remain here regardless
+ */
 int board_early_init_f(void)
 {
 	gpio_set_pull(S5PC110_GPIO_MP057, S5P_GPIO_PULL_UP);
@@ -443,6 +448,10 @@ int setup_bootcmd(void)
 	sprintf(bootmenu_entry, "bootmenu_%d", i++);
 	env_set(bootmenu_entry,
 		"Update u-boot.bin from SD=run uboot_update; sleep 5; bootd;");
+
+	sprintf(bootmenu_entry, "bootmenu_%d", i++);
+	env_set(bootmenu_entry,
+		"Update SPL from SD=run spl_update; sleep 5; bootd;");
 
 	/* terminate bootmenu entries, in case of residual configs */
 	sprintf(bootmenu_entry, "bootmenu_%d", i++);
