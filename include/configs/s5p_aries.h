@@ -19,6 +19,7 @@
 #include <asm/arch/cpu.h>		/* get chip and board defs */
 
 #define CONFIG_ARCH_CPU_INIT
+#define CONFIG_SKIP_LOWLEVEL_INIT
 
 /* Disable L2 cache - enabling causes slowdowns of ~50% in Linux */
 #define CONFIG_SYS_L2CACHE_OFF
@@ -28,6 +29,10 @@
 
 /* DRAM Base */
 #define CONFIG_SYS_SDRAM_BASE		0x30000000
+
+#define CONFIG_SPL_TEXT_BASE		0xD0021000
+#define CONFIG_SPL_MAX_FOOTPRINT	0x2000
+#define CONFIG_SPL_STACK		0xD0036000
 
 /* Max u-boot.bin size - 3 256K OneNAND pages */
 #define CONFIG_BOARD_SIZE_LIMIT		0xC0000
@@ -92,21 +97,21 @@
 	"ramdisk_addr_r=0x40000000\0" \
 	"bootubipart=ubi\0" \
 	"uboot_load_addr=0x33000000\0" \
-	"uboot_onenand_off=0x1200000\0" \
+	"uboot_onenand_off="__stringify(CONFIG_SYS_ONENAND_U_BOOT_OFFS)"\0" \
 	"uboot_onenand_size="__stringify(CONFIG_BOARD_SIZE_LIMIT)"\0" \
 	"meminfo=mem=80M mem=256M@0x40000000 mem=128M@0x50000000\0" \
 	"stdin=serial,gpio-keys\0" \
 	"stdout=serial,vidconsole\0" \
 	"stderr=serial,vidconsole\0" \
 	"bootargs=console=${console} ${mtdparts} ubi.mtd=ubi;\0" \
-	"uboot_update=if test -e mmc 0:1 u-boot.bin; then "\
-		"load mmc 0:1 ${uboot_load_addr} u-boot.bin; "\
+	"uboot_update=load mmc 0:1 ${uboot_load_addr} u-boot.bin; "\
 		"if onenand checkbad ${uboot_onenand_off} ${uboot_onenand_size}; "\
 			"then onenand erase ${uboot_onenand_off} ${uboot_onenand_size}; "\
 			"onenand write ${uboot_load_addr} ${uboot_onenand_off} ${uboot_onenand_size}; echo Success!; " \
 			"else echo OneNAND contains bad blocks, must use Odin/Heimdall; " \
-		"fi;" \
-		"else echo u-boot.bin not present, not updating; fi;\0" \
+		"fi;\0" \
+	"spl_update=load mmc 0:1 ${uboot_load_addr} aries-spl.bin && "\
+		"onenand erase 0x0 0x40000 && onenand write ${uboot_load_addr} 0x0 0x40000;\0" \
 	"do_onenand_android_boot=setenv bootargs ${mtdparts} ubi.mtd=ubi androidboot.mode=${boot_mode} androidboot.serialno=${serial#}; "\
 		"onenand read ${kernel_addr_r} ${onenand_load_offset} 0xa00000; bootm ${kernel_addr_r};\0" \
 	"onenand_android_boot=Android Boot=if test \"${prev_cmd}\" != \"${do_onenand_android_boot}\"; " \
