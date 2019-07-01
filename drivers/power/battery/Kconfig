@@ -4,3 +4,9 @@ config DM_BATTERY
 	---help---
 	This config enables driver model battery support.
 
+config DM_BATTERY_MAX17040
+	bool "MAX17040 battery/fuelgauge driver"
+	depends on DM_BATTERY
+	---help---
+	Enable support for the max17040 and max77836 fuelgauge
+
