@@ -61,6 +61,11 @@
 			compatible = "maxim,max8998";
 			reg = <0x66 0 0>;
 
+			charger {
+				/* regulator name to allow binding */
+				regulator-name = "charger";
+			};
+
 			voltage-regulators {
 				ldo2_reg: LDO2 {
 					regulator-compatible = "LDO2";
