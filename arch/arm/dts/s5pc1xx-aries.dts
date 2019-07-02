@@ -7,6 +7,7 @@
 
 /dts-v1/;
 
+#include <dt-bindings/gpio/gpio.h>
 #include "skeleton.dtsi"
 #include "s5pc110-pinctrl.dtsi"
 
@@ -30,6 +31,21 @@
 		compatible = "samsung,exynos4210-uart";
 		reg = <0xe2900800 0x400>;
 		id = <2>;
+	};
+
+	i2c_fuel: i2c-gpio-1 {
+		compatible = "i2c-gpio";
+		gpios = <&gpmp05 1 0>, /* sda */
+			<&gpmp05 0 0>; /* scl */
+		i2c-gpio,delay-us = <2>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		fg: fuelgauge@36 {
+			compatible = "maxim,max17040";
+			reg = <0x36>;
+			maxim,rcomp-value = <0xB000>;
+		};
 	};
 
 	i2c_pmic: i2c-pmic {
