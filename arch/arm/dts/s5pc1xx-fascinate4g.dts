@@ -37,3 +37,7 @@
 		};
 	};
 };
+
+&fg {
+	maxim,rcomp-value = <0xD000>;
+};
