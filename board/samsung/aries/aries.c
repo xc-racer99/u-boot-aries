@@ -9,6 +9,8 @@
 #include <asm/gpio.h>
 #include <asm/arch/mmc.h>
 #include <dm.h>
+#include <power/battery.h>
+#include <power/charger.h>
 #include <power/pmic.h>
 #include <usb/dwc2_udc.h>
 #include <asm/arch/cpu.h>
@@ -357,6 +359,50 @@ void setup_android_options(int pressed)
 	}
 }
 
+static void power_off(void)
+{
+	unsigned int reg = readl(S5PC110_PS_HOLD_CTRL);
+	reg &= 0xFFFFFEFF;
+	writel(reg, S5PC110_PS_HOLD_CTRL);
+}
+
+static void battery_check(void)
+{
+	struct udevice *bat, *charger;
+	int ret, state;
+
+	ret = uclass_get_device(UCLASS_BATTERY, 0, &bat);
+	if (ret) {
+		printf("%s: failed to get battery device: %d\n", __func__, ret);
+		return;
+	}
+
+	state = battery_get_status(bat);
+	if (state != BAT_STATE_NEED_CHARGING)
+		return;
+
+	ret = uclass_get_device(UCLASS_CHARGER, 0, &charger);
+	if (ret) {
+		printf("%s: failed to get charger device: %d\n", __func__, ret);
+		return;
+	}
+
+	if (charger_get_status(charger) == CHARGE_STATE_DISCHARGING) {
+		/* Low power, not charging, so power off */
+		printf("low_battery, not charging, so powering off\n");
+		power_off();
+		return;
+	}
+
+	/* wait until we have enough power */
+	while (battery_get_status(bat) == BAT_STATE_NEED_CHARGING) {
+		/* Make sure charger is still plugged in */
+		if (charger_get_status(charger) == CHARGE_STATE_DISCHARGING)
+			power_off();
+		mdelay(500);
+	}
+}
+
 int setup_bootcmd(void)
 {
 	int vol_up, vol_down;
@@ -497,6 +543,8 @@ int board_late_init(void)
 		sprintf(board_serial_str, "%016llx", board_serial);
 		env_set("serial#", board_serial_str);
 	}
+
+	battery_check();
 
 	return setup_bootcmd();
 }
