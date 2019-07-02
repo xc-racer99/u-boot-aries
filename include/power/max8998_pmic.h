@@ -67,6 +67,8 @@ enum {
 
 #define MAX8998_I2C_ADDR        (0xCC >> 1)
 
+#define MAX8998_CHARGER_DRIVER	"max8998_charger"
+
 enum { LDO_OFF, LDO_ON };
 
 #endif /* __MAX8998_PMIC_H_ */

@@ -3,3 +3,10 @@ config DM_CHARGER
 	depends on DM
 	---help---
 	This config enables driver model charger support.
+
+config DM_CHARGER_MAX8998
+	bool "Enable charger support for max8998 PMIC"
+	depends on DM_CHARGER
+	depends on DM_PMIC_MAX8998
+	depends on PMIC_CHILDREN
+
