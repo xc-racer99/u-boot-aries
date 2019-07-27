@@ -347,10 +347,20 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 
 void setup_android_options(int pressed)
 {
-	if (readl(S5PC110_INFORM5)) {
+	unsigned int inform5;
+
+	inform5 = readl(S5PC110_INFORM5);
+
+	/* Check for magical normal reboot value */
+	if (inform5 == 0x12345678) {
+		writel(0x0, S5PC110_INFORM5);
+		inform5 = 0;
+	}
+
+	if (inform5 != 0) {
 		env_set("boot_mode", "charger");
 		env_set("onenand_load_offset", "0x1980000");
-	} else if (pressed & recovery_keymask || readl(S5PC110_INFORM6)) {
+	} else if (pressed & recovery_keymask || readl(S5PC110_INFORM6) == 2) {
 		env_set("boot_mode", "recovery");
 		env_set("onenand_load_offset", "0x2380000");
 	} else {
