@@ -61,14 +61,16 @@ u32 get_board_rev(void)
 	return hwrev;
 }
 
-/*
- * This is only needed when not using the SPL
- * but as there is the option to use the stock
- * SBL it should remain here regardless
- */
 int board_early_init_f(void)
 {
-	gpio_set_pull(S5PC110_GPIO_MP057, S5P_GPIO_PULL_UP);
+	/**
+	 * Set the UART_SEL gpio
+	 *
+	 * This is only needed when not using the SPL
+	 * but as there is the option to use the stock
+	 * SBL it should remain here regardless
+	 */
+	gpio_set_pull(S5PC110_GPIO_MP057, S5P_GPIO_PULL_NONE);
 	gpio_cfg_pin(S5PC110_GPIO_MP057, S5P_GPIO_INPUT);
 	gpio_set_value(S5PC110_GPIO_MP057, 1);
 
@@ -77,9 +79,20 @@ int board_early_init_f(void)
 
 int board_init(void)
 {
+	struct udevice *dev;
+	int ret;
+
 	/* Set Initial global variables */
 	gd->bd->bi_arch_number = MACH_TYPE_SAMSUNG_ARIES;
 	gd->bd->bi_boot_params = PHYS_SDRAM_1 + 0x100;
+
+	/**
+	 * Probe FSA9480 to clear it's interrupt and accept
+	 * serial cable
+	 */
+	ret = uclass_get_device_by_name(UCLASS_I2C_GENERIC, "fsa9480@25", &dev);
+	if (ret)
+		pr_err("failed to find i2c_fsa9480: %d\n", ret);
 
 	return 0;
 }
