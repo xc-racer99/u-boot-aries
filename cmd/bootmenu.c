@@ -33,7 +33,7 @@ struct bootmenu_entry {
 
 struct bootmenu_data {
 	int delay;			/* delay for autoboot */
-	int active;			/* active menu entry */
+	long active;			/* active menu entry */
 	int count;			/* total count of menu entries */
 	struct bootmenu_entry *first;	/* first menu entry */
 };
@@ -75,7 +75,7 @@ static char *bootmenu_getoption_str(const char *opt, const char *prefix)
 static void bootmenu_print_entry(void *data)
 {
 	struct bootmenu_entry *entry = data;
-	int active = (entry->menu->active == entry->num);
+	long active = (entry->menu->active == entry->num);
 
 	/*
 	 * Move cursor to line where the entry will be drawn (entry->num)
@@ -280,7 +280,6 @@ static struct bootmenu_data *bootmenu_create(int delay, const char *prefix)
 		return NULL;
 
 	menu->delay = delay;
-	menu->active = 0;
 	menu->first = NULL;
 
 	while ((option = bootmenu_getoption(i, prefix))) {
@@ -382,7 +381,7 @@ static void bootmenu_show(int delay, const char *prefix)
 	struct menu *menu;
 	struct bootmenu_data *bootmenu;
 	struct bootmenu_entry *iter;
-	char *option, *sep;
+	char *option, *sep, *default_num;
 
 	/* If delay is 0 do not create menu, just run first entry */
 	if (delay == 0) {
@@ -404,6 +403,15 @@ static void bootmenu_show(int delay, const char *prefix)
 	if (!bootmenu)
 		return;
 
+	default_num = bootmenu_getoption_str("default", prefix);
+
+	if (!default_num)
+		default_num = "0";
+
+	bootmenu->active = simple_strtol(default_num, NULL, 10);
+	if (bootmenu->active < 0)
+		bootmenu->active = 0;
+
 	menu = menu_create(NULL, bootmenu->delay, 1, bootmenu_print_entry,
 			   bootmenu_choice_entry, bootmenu);
 	if (!menu) {
@@ -416,8 +424,7 @@ static void bootmenu_show(int delay, const char *prefix)
 			goto cleanup;
 	}
 
-	/* Default menu entry is always first */
-	menu_default_set(menu, "0");
+	menu_default_set(menu, default_num);
 
 	puts(ANSI_CURSOR_HIDE);
 	puts(ANSI_CLEAR_CONSOLE);
