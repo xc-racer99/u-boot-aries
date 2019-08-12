@@ -60,6 +60,18 @@ static char *bootmenu_getoption(unsigned short int n, const char *prefix)
 	return env_get(name);
 }
 
+static char *bootmenu_getoption_str(const char *opt, const char *prefix)
+{
+	char name[MAX_ENV_SIZE];
+
+	if (prefix != NULL)
+		sprintf(name, "%s%s", prefix, opt);
+	else
+		sprintf(name, "bootmenu_%s", opt);
+
+	return env_get(name);
+}
+
 static void bootmenu_print_entry(void *data)
 {
 	struct bootmenu_entry *entry = data;
@@ -499,7 +511,7 @@ int do_bootmenu(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 	}
 
 	if (!delay_str)
-		delay_str = env_get("bootmenu_delay");
+		delay_str = bootmenu_getoption_str("delay", prefix);
 
 	if (delay_str)
 		delay = (int)simple_strtol(delay_str, NULL, 10);
