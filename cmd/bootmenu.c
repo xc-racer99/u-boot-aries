@@ -35,6 +35,7 @@ struct bootmenu_data {
 	int delay;			/* delay for autoboot */
 	long active;			/* active menu entry */
 	int count;			/* total count of menu entries */
+	const char *prefix;		/* prefix to use for env cfgs */
 	struct bootmenu_entry *first;	/* first menu entry */
 };
 
@@ -281,6 +282,7 @@ static struct bootmenu_data *bootmenu_create(int delay, const char *prefix)
 
 	menu->delay = delay;
 	menu->first = NULL;
+	menu->prefix = prefix;
 
 	while ((option = bootmenu_getoption(i, prefix))) {
 		sep = strchr(option, '=');
@@ -470,16 +472,22 @@ void menu_display_statusline(struct menu *m)
 {
 	struct bootmenu_entry *entry;
 	struct bootmenu_data *menu;
+	char *title;
 
 	if (menu_default_choice(m, (void *)&entry) < 0)
 		return;
 
 	menu = entry->menu;
 
+	title = bootmenu_getoption_str("title", menu->prefix);
+
 	printf(ANSI_CURSOR_POSITION, 1, 1);
 	puts(ANSI_CLEAR_LINE);
 	printf(ANSI_CURSOR_POSITION, 2, 1);
-	puts("  *** U-Boot Boot Menu ***");
+	if (title)
+		puts(title);
+	else
+		puts("  *** U-Boot Boot Menu ***");
 	puts(ANSI_CLEAR_LINE_TO_END);
 	printf(ANSI_CURSOR_POSITION, 3, 1);
 	puts(ANSI_CLEAR_LINE);
