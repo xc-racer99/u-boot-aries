@@ -1597,6 +1597,8 @@ static void pxe_menu_to_bootmenu(cmd_tbl_t *cmdtp, struct pxe_menu *cfg)
 	if (default_num)
 		env_set("pxemenu_default", default_num);
 
+	env_set("pxemenu_no_console", "1");
+
 	/* run the bootmenu */
 	sprintf(bootmenu_cmd, "bootmenu %d pxemenu_",
 		DIV_ROUND_UP(cfg->timeout, 10));
