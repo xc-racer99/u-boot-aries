@@ -330,6 +330,12 @@ static struct bootmenu_data *bootmenu_create(int delay, const char *prefix)
 			break;
 	}
 
+	/* Don't add a U-Boot console entry if we don't want it */
+	if (bootmenu_getoption_str("no_console", prefix)) {
+		menu->count = i;
+		return menu;
+	}
+
 	/* Add U-Boot console entry at the end */
 	if (i <= MAX_COUNT - 1) {
 		entry = malloc(sizeof(struct bootmenu_entry));
