@@ -1570,24 +1570,32 @@ static void pxe_menu_to_bootmenu(cmd_tbl_t *cmdtp, struct pxe_menu *cfg)
 	struct pxe_label *label;
 	char entry[MAX_ENTRY_LEN];
 	char bootmenu_cmd[25];
-	char *selected;
+	char *selected, *default_num = NULL;
 	int err, i = 0;
 
 	list_for_each(pos, &cfg->labels) {
 		char *cmd;
 
 		label = list_entry(pos, struct pxe_label, list);
+		sprintf(label->num, "%d", i++);
 		cmd = malloc(28 + 2 * strlen(label->name));
 		if (!cmd)
 			return;
 
-		sprintf(entry, "pxemenu_%d", i++);
+		sprintf(entry, "pxemenu_%s", label->num);
 		sprintf(cmd, "%s=setenv pxe_bootmenu_label %s",
 			label->name, label->name);
 		env_set(entry, cmd);
 
+		if (cfg->default_label &&
+		    (strcmp(label->name, cfg->default_label) == 0))
+			default_num = label->num;
+
 		free(cmd);
 	}
+
+	if (default_num)
+		env_set("pxemenu_default", default_num);
 
 	/* run the bootmenu */
 	sprintf(bootmenu_cmd, "bootmenu %d pxemenu_",
