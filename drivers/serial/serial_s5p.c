@@ -61,8 +61,8 @@ static const int udivslot[] = {
 
 static void __maybe_unused s5p_serial_init(struct s5p_uart *uart)
 {
-	/* enable FIFOs, auto clear Rx FIFO */
-	writel(0x3, &uart->ufcon);
+	/* reset and enable FIFOs, set triggers to the maximum */
+	writel(0x0, &uart->ufcon);
 	writel(0, &uart->umcon);
 	/* 8N1 */
 	writel(0x3, &uart->ulcon);
@@ -143,7 +143,8 @@ static int s5p_serial_getc(struct udevice *dev)
 	struct s5p_serial_platdata *plat = dev->platdata;
 	struct s5p_uart *const uart = plat->reg;
 
-	if (!(readl(&uart->ufstat) & RX_FIFO_COUNT_MASK))
+	/* wait for character to arrive */
+	if (!(readl(&uart->utrstat) & 0x1))
 		return -EAGAIN;
 
 	serial_err_check(uart, 0);
@@ -155,7 +156,8 @@ static int s5p_serial_putc(struct udevice *dev, const char ch)
 	struct s5p_serial_platdata *plat = dev->platdata;
 	struct s5p_uart *const uart = plat->reg;
 
-	if (readl(&uart->ufstat) & TX_FIFO_FULL)
+	/* wait for room in the tx FIFO */
+	if (!(readl(&uart->utrstat) & 0x2))
 		return -EAGAIN;
 
 	writeb(ch, &uart->utxh);
